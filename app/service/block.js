@@ -78,7 +78,7 @@ class BlockService extends Service {
 
   async getRawBlock(arg) {
     const {Header, Transaction} = this.ctx.model
-    const {Header: RawHeader, Block: RawBlock} = this.app.qtuminfo.lib
+    const {Header: RawHeader, Block: RawBlock} = this.app.vipsinfo.lib
     let filter
     if (Number.isInteger(arg)) {
       filter = {height: arg}
@@ -142,7 +142,7 @@ class BlockService extends Service {
         WHERE l.height = header.height AND l.height = block.height AND address._id = block.miner_id
         ORDER BY l.height ASC
       `, {type: db.QueryTypes.SELECT, transaction: this.ctx.state.transaction})
-    } else { 
+    } else {
       blocks = await db.query(sql`
         SELECT
           header.hash AS hash, l.height AS height, header.timestamp AS timestamp,
@@ -307,8 +307,8 @@ class BlockService extends Service {
 
   async getBlockAddressTransactions(height) {
     const {Address, Transaction, BalanceChange, EvmReceipt: EVMReceipt, EvmReceiptLog: EVMReceiptLog, Contract} = this.ctx.model
-    const {Address: RawAddress} = this.app.qtuminfo.lib
-    const TransferABI = this.app.qtuminfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
+    const {Address: RawAddress} = this.app.vipsinfo.lib
+    const TransferABI = this.app.vipsinfo.lib.Solidity.qrc20ABIs.find(abi => abi.name === 'Transfer')
     let result = []
     let balanceChanges = await BalanceChange.findAll({
       attributes: [],

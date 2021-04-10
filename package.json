@@ -1,9 +1,12 @@
 {
-  "name": "qtuminfo-api",
+  "name": "vipsinfo-api",
   "private": true,
+  "egg": {
+    "typescript": true
+  },
   "scripts": {
-    "start": "egg-scripts start --title=qtuminfo-api --sticky --daemon",
-    "stop": "egg-scripts stop --title=qtuminfo-api",
+    "start": "egg-scripts start --title=vipsinfo-api --sticky --daemon",
+    "stop": "egg-scripts stop --title=vipsinfo-api",
     "dev": "egg-bin dev",
     "lint": "eslint --ext .js app config"
   },

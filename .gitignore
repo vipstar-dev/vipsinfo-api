@@ -74,3 +74,6 @@ typings/
 
 /run
 config/config.local.js
+
+# IDE / Editer
+.idea

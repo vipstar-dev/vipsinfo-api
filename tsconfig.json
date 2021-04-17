@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "allowJs": true,
+    "strict": true,
+    "declaration": true,
+    "newLine": "lf",
+    "noEmit": false,
+    "esModuleInterop": true,
+    "noImplicitThis": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "types": [
+      "@types/node",
+      "egg",
+      "egg-cors",
+      "egg-redis",
+      "egg-scripts",
+      "egg-sequelize",
+      "egg-socket.io"
+    ],
+    "typeRoots": [
+      "types"
+    ],
+    "outDir": "dist",
+    /* Advanced Options */
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

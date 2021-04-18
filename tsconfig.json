@@ -27,7 +27,6 @@
       "egg",
       "egg-cors",
       "egg-redis",
-      "egg-scripts",
       "egg-sequelize",
       "egg-socket.io"
     ],

@@ -1,6 +1,7 @@
 import { MiddlewareOptions } from 'koa-ratelimit'
 import { Transaction as SequelizeTransaction } from 'sequelize'
 import { chainType, IAddress, IChain } from 'vipsinfo/lib'
+import { ITip } from 'vipsinfo/node/services/db'
 
 import { ContractObject } from '@/app/middleware/contract'
 
@@ -8,7 +9,7 @@ declare module 'egg' {
   export const CHAIN = Symbol('vips.chain')
   interface Application {
     blockchainInfo: {
-      tip: null
+      tip: ITip | null
     }
     [CHAIN]: IChain | undefined
     chain: IChain

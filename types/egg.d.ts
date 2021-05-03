@@ -71,6 +71,14 @@ declare module 'egg' {
     [key: string]: ContractObject
   }
 
+  interface ContextStateForPagination extends CustomContextBase {
+    pagination: {
+      limit: number
+      offset: number
+      reversed: boolean | undefined
+    }
+  }
+
   interface CustomContextBase<ResponseBodyT = any>
     extends Context<ResponseBodyT> {
     state: ContextStateBase
@@ -92,5 +100,9 @@ declare module 'egg' {
       [key: string]: string
     }
     state: ContextStateForContract
+  }
+
+  export interface CustomContextForPagination extends CustomContextBase {
+    state: ContextStateForPagination
   }
 }

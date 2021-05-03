@@ -39,5 +39,7 @@ declare module 'egg' {
         }
       }
     }
+    // koa-retelimit config
+    ratelimit: MiddlewareOptions
   }
 }

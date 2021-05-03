@@ -1,4 +1,6 @@
-import { chainType, IChain } from 'vipsinfo/lib'
+import { MiddlewareOptions } from 'koa-ratelimit'
+import { Transaction as SequelizeTransaction } from 'sequelize'
+import { chainType, IAddress, IChain } from 'vipsinfo/lib'
 
 declare module 'egg' {
   export const CHAIN = Symbol('vips.chain')
@@ -7,6 +9,7 @@ declare module 'egg' {
       tip: null
     }
     [CHAIN]: IChain | undefined
+    chain: IChain
   }
 
   interface EggAppConfig {
@@ -41,5 +44,26 @@ declare module 'egg' {
     }
     // koa-retelimit config
     ratelimit: MiddlewareOptions
+  }
+
+  interface ContextParams {
+    address: string
+  }
+
+  interface StateAddress {
+    rawAddresses: (IAddress | undefined)[]
+    addressIds: bigint[]
+    p2pkhAddressIds: bigint[]
+  }
+
+  interface ContextState {
+    address: StateAddress
+    transaction: SequelizeTransaction
+  }
+
+  export interface CustomContext<ResponseBodyT = any>
+    extends Context<ResponseBodyT> {
+    params: ContextParams
+    state: ContextState
   }
 }

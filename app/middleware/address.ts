@@ -1,4 +1,4 @@
-import { CustomContext } from 'egg'
+import { CustomContextForAddress } from 'egg'
 import { Op } from 'sequelize'
 import { Address as RawAddress, IAddress } from 'vipsinfo/lib'
 import Address from 'vipsinfo/node/models/address'
@@ -6,7 +6,7 @@ import Address from 'vipsinfo/node/models/address'
 const { in: $in } = Op
 
 export default function address() {
-  return async (ctx: CustomContext, next: CallableFunction) => {
+  return async (ctx: CustomContextForAddress, next: CallableFunction) => {
     const chain = ctx.app.chain
     const addresses: string[] = ctx.params.address.split(',')
     const rawAddresses: (IAddress | undefined)[] = []

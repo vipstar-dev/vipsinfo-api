@@ -46,24 +46,20 @@ declare module 'egg' {
     ratelimit: MiddlewareOptions
   }
 
-  interface ContextParams {
-    address: string
-  }
-
   interface StateAddress {
     rawAddresses: (IAddress | undefined)[]
     addressIds: bigint[]
     p2pkhAddressIds: bigint[]
   }
 
-  interface ContextState {
-    address: StateAddress
-    transaction: SequelizeTransaction
-  }
-
-  export interface CustomContext<ResponseBodyT = any>
+  export interface CustomContextForAddress<ResponseBodyT = any>
     extends Context<ResponseBodyT> {
-    params: ContextParams
-    state: ContextState
+    params: {
+      address: string
+    }
+    state: {
+      address: StateAddress
+      transaction: SequelizeTransaction
+    }
   }
 }

@@ -27,7 +27,7 @@
       "egg",
       "egg-cors",
       "egg-redis",
-      "egg-sequelize",
+      "egg-sequelize-ts",
       "egg-socket.io"
     ],
     "typeRoots": [

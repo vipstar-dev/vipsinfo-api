@@ -11,7 +11,7 @@ interface BlockFilterObject {
   [key: string]: any
 }
 
-export default function pagination() {
+export default function blockFilter() {
   return async (ctx: CustomContextForBlockFilter, next: CallableFunction) => {
     if (!['GET', 'POST'].includes(ctx.method)) {
       await next()

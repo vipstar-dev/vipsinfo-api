@@ -2,6 +2,8 @@ import { MiddlewareOptions } from 'koa-ratelimit'
 import { Transaction as SequelizeTransaction } from 'sequelize'
 import { chainType, IAddress, IChain } from 'vipsinfo/lib'
 
+import { ContractObject } from '@/app/middleware/contract'
+
 declare module 'egg' {
   export const CHAIN = Symbol('vips.chain')
   interface Application {
@@ -65,6 +67,10 @@ declare module 'egg' {
     toBlock: number | null
   }
 
+  interface ContextStateForContract extends ContextStateBase {
+    [key: string]: ContractObject
+  }
+
   interface CustomContextBase<ResponseBodyT = any>
     extends Context<ResponseBodyT> {
     state: ContextStateBase
@@ -79,5 +85,12 @@ declare module 'egg' {
 
   export interface CustomContextForBlockFilter extends CustomContextBase {
     state: ContextStateForBlockFilter
+  }
+
+  export interface CustomContextForContract extends CustomContextBase {
+    params: {
+      [key: string]: string
+    }
+    state: ContextStateForContract
   }
 }

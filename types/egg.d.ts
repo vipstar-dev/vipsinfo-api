@@ -52,14 +52,24 @@ declare module 'egg' {
     p2pkhAddressIds: bigint[]
   }
 
-  export interface CustomContextForAddress<ResponseBodyT = any>
+  interface ContextStateBase {
+    transaction: SequelizeTransaction
+  }
+
+  interface ContextStateForAddress extends CustomContextBase {
+    address: StateAddress
+  }
+
+  interface CustomContextBase<ResponseBodyT = any>
     extends Context<ResponseBodyT> {
+    state: ContextStateBase
+  }
+
+  export interface CustomContextForAddress<ResponseBodyT = any>
+    extends CustomContextBase<ResponseBodyT> {
     params: {
       address: string
     }
-    state: {
-      address: StateAddress
-      transaction: SequelizeTransaction
-    }
+    state: ContextStateForAddress
   }
 }

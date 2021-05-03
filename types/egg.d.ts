@@ -60,16 +60,24 @@ declare module 'egg' {
     address: StateAddress
   }
 
+  interface ContextStateForBlockFilter extends ContextStateBase {
+    fromBlock: number
+    toBlock: number | null
+  }
+
   interface CustomContextBase<ResponseBodyT = any>
     extends Context<ResponseBodyT> {
     state: ContextStateBase
   }
 
-  export interface CustomContextForAddress<ResponseBodyT = any>
-    extends CustomContextBase<ResponseBodyT> {
+  export interface CustomContextForAddress extends CustomContextBase {
     params: {
       address: string
     }
     state: ContextStateForAddress
+  }
+
+  export interface CustomContextForBlockFilter extends CustomContextBase {
+    state: ContextStateForBlockFilter
   }
 }

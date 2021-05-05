@@ -2,6 +2,7 @@ import { MiddlewareOptions } from 'koa-ratelimit'
 import { Transaction as SequelizeTransaction } from 'sequelize'
 import { chainType, IAddress, IChain } from 'vipsinfo/lib'
 import { ITip } from 'vipsinfo/node/services/db'
+import { RpcClientConfig } from 'vipsinfo/rpc'
 
 import { ContractObject } from '@/app/middleware/contract'
 
@@ -18,13 +19,7 @@ declare module 'egg' {
   interface EggAppConfig {
     vipsinfo: {
       port: number
-      rpc: {
-        protocol: 'http' | 'https'
-        host: string
-        port: number
-        user: string
-        password: string
-      }
+      rpc: RpcClientConfig
     }
     vips: {
       chain: chainType

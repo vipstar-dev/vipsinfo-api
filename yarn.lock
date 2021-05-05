@@ -7920,10 +7920,10 @@ vary@^1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
 
-vipsinfo@^0.0.6:
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/vipsinfo/-/vipsinfo-0.0.6.tgz#d4cf9044d688cbc01bf0045b267233e25ff599d3"
-  integrity sha512-qkH3xkr6nCD/QRY16zJ5WKdcwtidLjy/KleppM/CXv8rzwlgL6hDHoJ0+czTsssyVA8XxsK1dVUsc7Rxq45/IQ==
+vipsinfo@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/vipsinfo/-/vipsinfo-0.0.7.tgz#c671e8592c1040fd4a709a84ebb4fc6566ebe7bc"
+  integrity sha512-fxcdyO4lzzfIXM36TXAr3err5ReXM3h+Jw/iDfZrbBde2KUf5W0j3er8pAG1rkolOdsrW5Sg6l5C3XWv88jv8w==
   dependencies:
     colors "^1.3.3"
     commander "^3.0.1"

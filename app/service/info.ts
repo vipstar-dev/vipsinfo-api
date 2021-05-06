@@ -28,14 +28,14 @@ interface DgpInfoObject {
 export interface IInfoService extends Service {
   getInfo(): Promise<infoObject>
   getTotalSupply(): Promise<number>
-  etTotalMaxSupply(): number
+  getTotalMaxSupply(): number
   getCirculatingSupply(): Promise<number>
   getStakeWeight(): Promise<number>
   getFeeRates(): Promise<FeeRateObject[]>
   getDGPInfo(): Promise<DgpInfoObject>
 }
 
-class InfoService extends Service {
+class InfoService extends Service implements IInfoService {
   async getInfo(): Promise<infoObject> {
     const height = this.app.blockchainInfo.tip?.height as number
     const stakeWeight =

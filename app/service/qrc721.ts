@@ -46,7 +46,7 @@ export interface IQRC721Service extends Service {
   getAllQRC721Balances(hexAddresses: Buffer[]): Promise<AllQRC721Balances[]>
 }
 
-class QRC721Service extends Service {
+class QRC721Service extends Service implements IQRC721Service {
   async listQRC721Tokens(): Promise<ListQrc721Tokens> {
     const db = this.ctx.model
     const { limit, offset } = (this.ctx

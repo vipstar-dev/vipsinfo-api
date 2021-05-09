@@ -18,17 +18,17 @@ interface TotalBalanceChangesObjectFromDb {
   totalSent: string
 }
 
-interface TotalBalanceChangesObject {
+export interface TotalBalanceChangesObject {
   totalReceived: bigint
   totalSent: bigint
 }
 
-interface BalanceHistoryObject {
+export interface BalanceHistoryObject {
   totalCount: number
   transactions: TransactionHistory[]
 }
 
-interface RichListObject {
+export interface RichListObject {
   totalCount: number
   list: {
     address: string
@@ -56,7 +56,7 @@ interface BalanceHistory2
   value: bigint
 }
 
-interface TransactionHistory {
+export interface TransactionHistory {
   amount: bigint
   block: {
     hash: Buffer

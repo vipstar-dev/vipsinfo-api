@@ -5,7 +5,7 @@ import RpcClient, { EstimateSmartFeeResult } from 'vipsinfo/rpc'
 
 const { gte: $gte } = Op
 
-interface infoObject {
+export interface InfoObject {
   height: number
   supply: number
   circulatingSupply?: number
@@ -14,19 +14,19 @@ interface infoObject {
   dgpInfo: Partial<DgpInfoObject>
 }
 
-interface FeeRateObject {
+export interface FeeRateObject {
   blocks: number
   feeRate: number
 }
 
-interface DgpInfoObject {
+export interface DgpInfoObject {
   maxBlockSize: number
   minGasPrice: number
   blockGasLimit: number
 }
 
 export interface IInfoService extends Service {
-  getInfo(): Promise<infoObject>
+  getInfo(): Promise<InfoObject>
   getTotalSupply(): Promise<number>
   getTotalMaxSupply(): number
   getCirculatingSupply(): Promise<number>
@@ -36,7 +36,7 @@ export interface IInfoService extends Service {
 }
 
 class InfoService extends Service implements IInfoService {
-  async getInfo(): Promise<infoObject> {
+  async getInfo(): Promise<InfoObject> {
     const height = this.app.blockchainInfo.tip?.height as number
     const stakeWeight =
       (JSON.parse(

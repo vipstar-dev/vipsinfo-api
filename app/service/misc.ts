@@ -9,6 +9,14 @@ import { sql } from 'vipsinfo/node/utils'
 
 const { or: $or, like: $like } = Op
 
+export interface ClassifyObject {
+  type?: string
+  address?: string
+  addressHex?: string
+}
+
+export type PricesObject = { [key in 'USD' | 'JPY']: number | undefined }
+
 interface PriceJson {
   vipstarcoin: {
     jpy?: number
@@ -17,16 +25,12 @@ interface PriceJson {
 }
 
 export interface IMiscService extends Service {
-  classify(
-    id: string
-  ): Promise<{ type?: string; address?: string; addressHex?: string }>
-  getPrices(): Promise<{ [key in 'USD' | 'JPY']: number | undefined }>
+  classify(id: string): Promise<ClassifyObject>
+  getPrices(): Promise<PricesObject>
 }
 
 class MiscService extends Service implements IMiscService {
-  async classify(
-    id: string
-  ): Promise<{ type?: string; address?: string; addressHex?: string }> {
+  async classify(id: string): Promise<ClassifyObject> {
     const db = this.ctx.model
     const transaction = (this.ctx.state as ContextStateBase).transaction
 
@@ -142,7 +146,7 @@ class MiscService extends Service implements IMiscService {
     return {}
   }
 
-  async getPrices(): Promise<{ [key in 'USD' | 'JPY']: number | undefined }> {
+  async getPrices(): Promise<PricesObject> {
     const [USDResult, JPYResult] = await Promise.all([
       this.ctx.curl(
         'https://api.coingecko.com/api/v3/simple/price?ids=vipstarcoin&vs_currencies=usd',

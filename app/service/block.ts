@@ -38,7 +38,7 @@ import { sql } from 'vipsinfo/node/utils'
 
 const { gte: $gte, lte: $lte, between: $between } = Op
 
-interface BlockObject
+export interface BlockObject
   extends Omit<
     HeaderModelAttributes,
     'isProofOfStake' | 'block' | 'transactions'

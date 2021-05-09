@@ -114,7 +114,7 @@ interface ContractSpendIO {
   value: bigint
 }
 
-interface ContractSpendIOString {
+export interface ContractSpendIOString {
   address?: string
   addressHex?: string
   value: string
@@ -125,7 +125,7 @@ interface ContractSpendDb {
   outputs: ContractSpendIO[]
 }
 
-interface TransactionInputObject
+export interface TransactionInputObject
   extends Pick<
     TransactionInputCreationAttributes,
     'outputIndex' | 'scriptSig' | 'sequence' | 'value'
@@ -138,7 +138,7 @@ interface TransactionInputObject
   isInvalidContract?: true
 }
 
-interface TransactionOutputObject
+export interface TransactionOutputObject
   extends Pick<TransactionOutputCreationAttributes, 'scriptPubKey' | 'value'> {
   address?: string
   addressHex?: Buffer
@@ -167,7 +167,7 @@ interface TransactionOutputObject
   }
 }
 
-interface TransactionObject
+export interface TransactionObject
   extends Pick<
     TransactionCreationAttributes,
     'id' | 'hash' | 'version' | 'flag' | 'lockTime' | 'size' | 'weight'
@@ -179,12 +179,12 @@ interface TransactionObject
   contractSpends: ContractSpendDb[]
 }
 
-interface AllTransactionObject {
+export interface AllTransactionObject {
   totalCount: number
   ids: Buffer[]
 }
 
-interface TransformedTransactionObject {
+export interface TransformedTransactionObject {
   id: string
   hash?: string
   version?: number
@@ -213,7 +213,7 @@ interface TransformedTransactionObject {
   qrc721TokenTransfers: Qrc721TransferObject[] | undefined
 }
 
-interface TransformedTransactionInputObject {
+export interface TransformedTransactionInputObject {
   coinbase?: string
   prevTxId?: string
   outputIndex?: number
@@ -230,7 +230,7 @@ interface TransformedTransactionInputObject {
   witness: string[]
 }
 
-interface TransformedTransactionOutputObject {
+export interface TransformedTransactionOutputObject {
   value: string
   address: string
   addressHex: string
@@ -259,7 +259,7 @@ interface TransformedTransactionOutputObject {
   }
 }
 
-interface Qrc20TransferObject
+export interface Qrc20TransferObject
   extends Pick<Qrc20CreationAttributes, 'name' | 'symbol' | 'decimals'> {
   address: string
   addressHex: string
@@ -270,7 +270,7 @@ interface Qrc20TransferObject
   value: string
 }
 
-interface Qrc20UnconfirmedTransferObject
+export interface Qrc20UnconfirmedTransferObject
   extends Pick<Qrc20CreationAttributes, 'name' | 'symbol' | 'decimals'> {
   address: string
   addressHex: string
@@ -280,7 +280,7 @@ interface Qrc20UnconfirmedTransferObject
   value: string
 }
 
-interface Qrc721TransferObject
+export interface Qrc721TransferObject
   extends Pick<Qrc721CreationAttributes, 'name' | 'symbol'> {
   address: string
   addressHex: string
@@ -314,12 +314,12 @@ interface BasicTransactionOutputDb
   refundTo: Pick<GasRefundCreationAttributes, 'transactionId'>
 }
 
-interface ValueAndIdTxIO {
+export interface ValueAndIdTxIO {
   value: bigint
   addressId: bigint
 }
 
-interface BasicTransactionObject {
+export interface BasicTransactionObject {
   id: Buffer
   inputs: ValueAndIdTxIO[]
   outputs: ValueAndIdTxIO[]
@@ -353,7 +353,7 @@ interface ContractTxLogDb extends Omit<EVMReceiptLog, 'contract'> {
   contract: Pick<ContractCreationAttributes, 'addressString'>
 }
 
-interface ContractTransactionObject {
+export interface ContractTransactionObject {
   transactionId: Buffer
   outputIndex: number
   blockHeight?: number
@@ -378,7 +378,7 @@ interface ContractTransactionObject {
   }[]
 }
 
-interface BriefOption {
+export interface BriefOption {
   brief: boolean
 }
 

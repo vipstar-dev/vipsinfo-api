@@ -2,7 +2,7 @@ import { ContextStateBase, ContextStateForPagination, Service } from 'egg'
 import { QueryTypes } from 'sequelize'
 import { sql } from 'vipsinfo/node/utils'
 
-interface Qrc721Tokens {
+export interface Qrc721Tokens {
   address: string
   addressHex: Buffer
   name: string
@@ -11,12 +11,12 @@ interface Qrc721Tokens {
   holders: Buffer[]
 }
 
-interface ListQrc721Tokens {
+export interface ListQrc721Tokens {
   totalCount: number
   tokens: Qrc721Tokens[]
 }
 
-interface AllQRC721Balances {
+export interface AllQRC721Balances {
   addressHex: Buffer
   address: string
   name: string

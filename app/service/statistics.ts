@@ -9,7 +9,8 @@ interface DailyTransactionsDb {
   contractTransactionsCount: number
 }
 
-interface DailyTransactionsObject extends Omit<DailyTransactionsDb, 'date'> {
+export interface DailyTransactionsObject
+  extends Omit<DailyTransactionsDb, 'date'> {
   timestamp: number
 }
 
@@ -18,7 +19,7 @@ interface BlockIntervalStatisticsDb {
   count: number
 }
 
-interface BlockIntervalStatisticsObject {
+export interface BlockIntervalStatisticsObject {
   interval: number
   count: number
   percentage: number
@@ -29,7 +30,7 @@ interface AddressGrowthDb {
   count: number
 }
 
-interface AddressGrowthObject {
+export interface AddressGrowthObject {
   timestamp: number
   count: number
 }

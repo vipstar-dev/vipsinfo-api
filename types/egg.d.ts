@@ -7,6 +7,7 @@ import { RpcClientConfig } from 'vipsinfo/rpc'
 import { ContractObject } from '@/app/middleware/contract'
 import { IBalanceService } from '@/app/service/balance'
 import { IBlockService } from '@/app/service/block'
+import { IContractService } from '@/app/service/contract'
 import { IInfoService } from '@/app/service/info'
 import { IMiscService } from '@/app/service/misc'
 import { IQRC721Service } from '@/app/service/qrc721'
@@ -26,6 +27,7 @@ declare module 'egg' {
   interface IService {
     balance: IBalanceService
     block: IBlockService
+    contract: IContractService
     info: IInfoService
     misc: IMiscService
     qrc721: IQRC721Service

@@ -10,6 +10,7 @@ import { IBlockService } from '@/app/service/block'
 import { IInfoService } from '@/app/service/info'
 import { IMiscService } from '@/app/service/misc'
 import { IQRC721Service } from '@/app/service/qrc721'
+import { IStatisticsService } from '@/app/service/statistics'
 import { ITransactionService } from '@/app/service/transaction'
 
 declare module 'egg' {
@@ -28,6 +29,7 @@ declare module 'egg' {
     info: IInfoService
     misc: IMiscService
     qrc721: IQRC721Service
+    statistics: IStatisticsService
     transaction: ITransactionService
   }
 

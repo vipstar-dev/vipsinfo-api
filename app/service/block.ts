@@ -119,8 +119,8 @@ export interface IBlockService extends Service {
   getBlockSummary(blocks: BriefBlockObject[]): Promise<BlockSummaryObject[]>
   getBiggestMiners(lastNBlocks: number | null): Promise<BiggestMinersObject>
   getBlockTransactions(height: number): Promise<Buffer[]>
-  getBlockFilter(category: string): { [key: string]: object }
-  getRawBlockFilter(category: string): { raw: string }
+  getBlockFilter(category?: string): { [key: string]: object }
+  getRawBlockFilter(category?: string): { raw: string }
 }
 
 class BlockService extends Service implements IBlockService {

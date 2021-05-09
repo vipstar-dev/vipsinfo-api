@@ -30,7 +30,9 @@ import ContractSpend, {
 import EVMReceipt, {
   EvmReceiptCreationAttributes,
 } from 'vipsinfo/node/models/evm-receipt'
-import EVMReceiptLog from 'vipsinfo/node/models/evm-receipt-log'
+import EVMReceiptLog, {
+  EvmReceiptLogCreationAttributes,
+} from 'vipsinfo/node/models/evm-receipt-log'
 import GasRefund, {
   GasRefundCreationAttributes,
 } from 'vipsinfo/node/models/gas-refund'
@@ -420,7 +422,12 @@ export interface ITransactionService extends Service {
   getContractTransaction(
     receiptId: bigint
   ): Promise<ContractTransactionObject | null>
-  transformTopics(log: EventLogDb): Buffer[]
+  transformTopics(
+    log: Pick<
+      EvmReceiptLogCreationAttributes,
+      'topic1' | 'topic2' | 'topic3' | 'topic4'
+    > & { [key: string]: any }
+  ): Buffer[]
 }
 
 class TransactionService extends Service implements ITransactionService {
@@ -1837,7 +1844,12 @@ class TransactionService extends Service implements ITransactionService {
     }
   }
 
-  transformTopics(log: EventLogDb): Buffer[] {
+  transformTopics(
+    log: Pick<
+      EvmReceiptLogCreationAttributes,
+      'topic1' | 'topic2' | 'topic3' | 'topic4'
+    > & { [key: string]: any }
+  ): Buffer[] {
     const result = []
     if (log.topic1) {
       result.push(log.topic1)

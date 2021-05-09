@@ -61,7 +61,7 @@ interface DateFilter {
   max: number
 }
 
-interface BlockObject {
+interface BriefBlockObject {
   hash: Buffer
   height: number
   timestamp: number
@@ -116,7 +116,7 @@ export interface IBlockService extends Service {
   listBlocks(dateFilter: DateFilter | null): Promise<ListBlocksObject>
   getRecentBlocks(count: number): Promise<BlockSummaryObject[]>
   getBlockRewards(startHeight: number, endHeight: number): Promise<bigint[]>
-  getBlockSummary(blocks: BlockObject[]): Promise<BlockSummaryObject[]>
+  getBlockSummary(blocks: BriefBlockObject[]): Promise<BlockSummaryObject[]>
   getBiggestMiners(lastNBlocks: number | null): Promise<BiggestMinersObject>
   getBlockTransactions(height: number): Promise<Buffer[]>
   getBlockFilter(category: string): { [key: string]: object }
@@ -262,7 +262,7 @@ class BlockService extends Service implements IBlockService {
         transaction: (this.ctx.state as ContextStateBase).transaction,
       }
     )
-    let blocks: BlockObject[]
+    let blocks: BriefBlockObject[]
     if ((this.ctx.state as ContextStateForPagination).pagination) {
       const { limit, offset } = (this.ctx
         .state as ContextStateForPagination).pagination
@@ -318,7 +318,7 @@ class BlockService extends Service implements IBlockService {
 
   async getRecentBlocks(count: number): Promise<BlockSummaryObject[]> {
     const db = this.ctx.model
-    const blocks: BlockObject[] = await db.query(
+    const blocks: BriefBlockObject[] = await db.query(
       sql`
       SELECT
         l.hash AS hash, l.height AS height, header.timestamp AS timestamp,
@@ -388,7 +388,9 @@ class BlockService extends Service implements IBlockService {
     return result
   }
 
-  async getBlockSummary(blocks: BlockObject[]): Promise<BlockSummaryObject[]> {
+  async getBlockSummary(
+    blocks: BriefBlockObject[]
+  ): Promise<BlockSummaryObject[]> {
     const db = this.ctx.model
     const transactionCounts: {
       height: number

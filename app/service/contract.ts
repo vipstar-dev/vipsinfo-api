@@ -20,6 +20,7 @@ import TransactionOutput from 'vipsinfo/node/models/transaction-output'
 import { sql } from 'vipsinfo/node/utils'
 import RpcClient, { CallContractResult } from 'vipsinfo/rpc'
 
+import { Qrc20Data } from '@/app/service/qrc20'
 import { AllQRC721Balances } from '@/app/service/qrc721'
 
 const { in: $in } = Op
@@ -50,8 +51,7 @@ export interface ContractSummaryObject {
   totalReceived: bigint
   totalSent: bigint
   unconfirmed: bigint
-  // TODO: Change type after rewrite qrc20 service
-  qrc20Balances: any
+  qrc20Balances: Qrc20Data[]
   qrc721Balances: AllQRC721Balances[]
   transactionCount: number
 }

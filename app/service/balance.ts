@@ -1,14 +1,10 @@
 import { ContextStateBase, ContextStateForPagination, Service } from 'egg'
 import { Op, Optional, QueryTypes } from 'sequelize'
 import Address from 'vipsinfo/node/models/address'
-import BalanceChange, {
-  BalanceChangeModelAttributes,
-} from 'vipsinfo/node/models/balance-change'
-import Header, { HeaderModelAttributes } from 'vipsinfo/node/models/header'
+import BalanceChange from 'vipsinfo/node/models/balance-change'
+import Header from 'vipsinfo/node/models/header'
 import RichList from 'vipsinfo/node/models/rich-rist'
-import Transaction, {
-  TransactionModelAttributes,
-} from 'vipsinfo/node/models/transaction'
+import Transaction from 'vipsinfo/node/models/transaction'
 import TransactionOutput from 'vipsinfo/node/models/transaction-output'
 import { sql } from 'vipsinfo/node/utils'
 const { between: $between, in: $in, ne: $ne, gt: $gt } = Op
@@ -38,19 +34,16 @@ export interface RichListObject {
 
 interface BalanceHistory1
   extends Pick<
-    BalanceChangeModelAttributes,
+    BalanceChange,
     'transactionId' | 'blockHeight' | 'indexInBlock' | 'value'
   > {
-  header: Pick<HeaderModelAttributes, 'hash' | 'timestamp'>
-  transaction: Pick<TransactionModelAttributes, 'id'>
+  header: Pick<Header, 'hash' | 'timestamp'>
+  transaction: Pick<Transaction, 'id'>
 }
 
 interface BalanceHistory2
-  extends Pick<
-      TransactionModelAttributes,
-      'id' | 'blockHeight' | 'indexInBlock'
-    >,
-    Pick<HeaderModelAttributes, 'timestamp'> {
+  extends Pick<Transaction, 'id' | 'blockHeight' | 'indexInBlock'>,
+    Pick<Header, 'timestamp'> {
   transactionId: bigint
   blockHash: Buffer
   value: bigint
@@ -300,7 +293,7 @@ class BalanceService extends Service implements IBalanceService {
       }
       if (havingFilter) {
         const balanceChanges: Pick<
-          BalanceChangeModelAttributes,
+          BalanceChange,
           'blockHeight' | 'indexInBlock' | 'transactionId'
         >[] = await db.query(
           sql`

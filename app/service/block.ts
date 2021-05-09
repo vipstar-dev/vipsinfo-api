@@ -13,27 +13,14 @@ import {
   ITransaction,
   qrc20ABIs,
 } from 'vipsinfo/lib'
-import Address, {
-  AddressCreationAttributes,
-} from 'vipsinfo/node/models/address'
+import Address from 'vipsinfo/node/models/address'
 import BalanceChange from 'vipsinfo/node/models/balance-change'
 import Block from 'vipsinfo/node/models/block'
-import Contract, {
-  ContractCreationAttributes,
-} from 'vipsinfo/node/models/contract'
-import EVMReceipt, {
-  EvmReceiptCreationAttributes,
-} from 'vipsinfo/node/models/evm-receipt'
-import EVMReceiptLog, {
-  EvmReceiptLogCreationAttributes,
-} from 'vipsinfo/node/models/evm-receipt-log'
-import Header, {
-  HeaderCreationAttributes,
-  HeaderModelAttributes,
-} from 'vipsinfo/node/models/header'
-import Transaction, {
-  TransactionCreationAttributes,
-} from 'vipsinfo/node/models/transaction'
+import Contract from 'vipsinfo/node/models/contract'
+import EVMReceipt from 'vipsinfo/node/models/evm-receipt'
+import EVMReceiptLog from 'vipsinfo/node/models/evm-receipt-log'
+import Header, { HeaderModelAttributes } from 'vipsinfo/node/models/header'
+import Transaction from 'vipsinfo/node/models/transaction'
 import { sql } from 'vipsinfo/node/utils'
 
 const { gte: $gte, lte: $lte, between: $between } = Op
@@ -97,17 +84,14 @@ interface BiggestMinersObject {
 }
 
 interface BalanceChangesDb {
-  transaction: Pick<TransactionCreationAttributes, 'indexInBlock'>
-  address: Pick<AddressCreationAttributes, 'string'>
+  transaction: Pick<Transaction, 'indexInBlock'>
+  address: Pick<Address, 'string'>
 }
 
 interface ReceiptLogDb
-  extends Pick<
-    EvmReceiptLogCreationAttributes,
-    'topic1' | 'topic2' | 'topic3' | 'topic4'
-  > {
-  receipt: Pick<EvmReceiptCreationAttributes, 'indexInBlock'>
-  contract: Pick<ContractCreationAttributes, 'addressString' | 'type'>
+  extends Pick<EVMReceiptLog, 'topic1' | 'topic2' | 'topic3' | 'topic4'> {
+  receipt: Pick<EVMReceipt, 'indexInBlock'>
+  contract: Pick<Contract, 'addressString' | 'type'>
 }
 
 export interface IBlockService extends Service {
@@ -421,7 +405,7 @@ class BlockService extends Service implements IBlockService {
         where: { height: blocks[0].height - 1 },
         attributes: ['timestamp'],
         transaction: (this.ctx.state as ContextStateBase).transaction,
-      }) as Promise<Pick<HeaderCreationAttributes, 'timestamp'> | null>,
+      }) as Promise<Pick<Header, 'timestamp'> | null>,
       this.getBlockRewards(
         blocks[0].height,
         blocks[blocks.length - 1].height + 1
@@ -498,10 +482,7 @@ class BlockService extends Service implements IBlockService {
   }
 
   async getBlockTransactions(height: number): Promise<Buffer[]> {
-    const transactions: Pick<
-      TransactionCreationAttributes,
-      'id'
-    >[] = await Transaction.findAll({
+    const transactions: Pick<Transaction, 'id'>[] = await Transaction.findAll({
       where: { blockHeight: height },
       attributes: ['id'],
       transaction: (this.ctx.state as ContextStateBase).transaction,
@@ -538,7 +519,7 @@ class BlockService extends Service implements IBlockService {
       result[transaction.indexInBlock].add(address.string)
     }
     const receipts: Pick<
-      EvmReceiptCreationAttributes,
+      EVMReceipt,
       'indexInBlock' | 'senderType' | 'senderData'
     >[] = await EVMReceipt.findAll({
       where: { blockHeight: height },

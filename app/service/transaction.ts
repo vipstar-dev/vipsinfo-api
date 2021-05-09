@@ -15,62 +15,39 @@ import {
   TransactionInput as RawTransactionInput,
   TransactionOutput as RawTransactionOutput,
 } from 'vipsinfo/lib'
-const { in: $in, or: $or, and: $and, gt: $gt } = Op
-
-import Address, {
-  AddressCreationAttributes,
-} from 'vipsinfo/node/models/address'
+import Address from 'vipsinfo/node/models/address'
 import BalanceChange from 'vipsinfo/node/models/balance-change'
-import Contract, {
-  ContractCreationAttributes,
-} from 'vipsinfo/node/models/contract'
-import ContractSpend, {
-  ContractSpendCreationAttributes,
-} from 'vipsinfo/node/models/contract-spend'
-import EVMReceipt, {
-  EvmReceiptCreationAttributes,
-} from 'vipsinfo/node/models/evm-receipt'
-import EVMReceiptLog, {
-  EvmReceiptLogCreationAttributes,
-} from 'vipsinfo/node/models/evm-receipt-log'
-import GasRefund, {
-  GasRefundCreationAttributes,
-} from 'vipsinfo/node/models/gas-refund'
-import Header, { HeaderCreationAttributes } from 'vipsinfo/node/models/header'
-import QRC20, { Qrc20CreationAttributes } from 'vipsinfo/node/models/qrc20'
-import QRC721, { Qrc721CreationAttributes } from 'vipsinfo/node/models/qrc721'
-import Transaction, {
-  TransactionCreationAttributes,
-} from 'vipsinfo/node/models/transaction'
-import TransactionInput, {
-  TransactionInputCreationAttributes,
-} from 'vipsinfo/node/models/transaction-input'
-import TransactionOutput, {
-  TransactionOutputCreationAttributes,
-} from 'vipsinfo/node/models/transaction-output'
-import Witness, {
-  WitnessCreationAttributes,
-} from 'vipsinfo/node/models/witness'
+import Contract from 'vipsinfo/node/models/contract'
+import ContractSpend from 'vipsinfo/node/models/contract-spend'
+import EVMReceipt from 'vipsinfo/node/models/evm-receipt'
+import EVMReceiptLog from 'vipsinfo/node/models/evm-receipt-log'
+import GasRefund from 'vipsinfo/node/models/gas-refund'
+import Header from 'vipsinfo/node/models/header'
+import QRC20 from 'vipsinfo/node/models/qrc20'
+import QRC721 from 'vipsinfo/node/models/qrc721'
+import Transaction from 'vipsinfo/node/models/transaction'
+import TransactionInput from 'vipsinfo/node/models/transaction-input'
+import TransactionOutput from 'vipsinfo/node/models/transaction-output'
+import Witness from 'vipsinfo/node/models/witness'
 import { sql } from 'vipsinfo/node/utils'
 import RpcClient from 'vipsinfo/rpc'
 
+const { in: $in, or: $or, and: $and, gt: $gt } = Op
+
 interface TransactionDb
   extends Omit<Transaction, 'header' | 'contractSpendSource'> {
-  header: Pick<HeaderCreationAttributes, 'hash' | 'timestamp'>
-  contractSpendSource: Pick<ContractSpendCreationAttributes, 'destId'> & {
-    destTransaction: Pick<TransactionCreationAttributes, 'id'>
+  header: Pick<Header, 'hash' | 'timestamp'>
+  contractSpendSource: Pick<ContractSpend, 'destId'> & {
+    destTransaction: Pick<Transaction, 'id'>
   }
 }
 
 interface TransactionInputDb
   extends Omit<TransactionInput, 'outputTransaction' | 'output' | 'address'> {
-  outputTransaction: Pick<TransactionCreationAttributes, 'id'>
-  output: Pick<
-    TransactionOutputCreationAttributes,
-    'outputIndex' | 'scriptPubKey'
-  >
-  address: Pick<AddressCreationAttributes, 'type' | 'string'> & {
-    contract: Pick<ContractCreationAttributes, 'address' | 'addressString'>
+  outputTransaction: Pick<Transaction, 'id'>
+  output: Pick<TransactionOutput, 'outputIndex' | 'scriptPubKey'>
+  address: Pick<Address, 'type' | 'string'> & {
+    contract: Pick<Contract, 'address' | 'addressString'>
   }
 }
 
@@ -79,34 +56,34 @@ interface TransactionOutputDb
     TransactionOutput,
     'inputTransaction' | 'address' | 'refund' | 'refundTo' | 'evmReceipt'
   > {
-  inputTransaction: Pick<TransactionCreationAttributes, 'id'>
-  address: Pick<AddressCreationAttributes, 'type' | 'string'> & {
-    contract: Pick<ContractCreationAttributes, 'address' | 'addressString'>
+  inputTransaction: Pick<Transaction, 'id'>
+  address: Pick<Address, 'type' | 'string'> & {
+    contract: Pick<Contract, 'address' | 'addressString'>
   }
-  refund: Pick<GasRefundCreationAttributes, 'refundIndex'> & {
-    refundToTransaction: Pick<TransactionCreationAttributes, 'id'>
-    refundTo: Pick<TransactionOutputCreationAttributes, 'value'>
+  refund: Pick<GasRefund, 'refundIndex'> & {
+    refundToTransaction: Pick<Transaction, 'id'>
+    refundTo: Pick<TransactionOutput, 'value'>
   }
-  refundTo: Pick<GasRefundCreationAttributes, 'outputIndex'> & {
-    transaction: Pick<TransactionCreationAttributes, 'id'>
+  refundTo: Pick<GasRefund, 'outputIndex'> & {
+    transaction: Pick<Transaction, 'id'>
   }
   evmReceipt: Omit<EVMReceipt, 'contract'> & {
-    contract: Pick<ContractCreationAttributes, 'addressString'>
+    contract: Pick<Contract, 'addressString'>
   }
 }
 
 interface EventLogDb
   extends Omit<EVMReceiptLog, 'contract' | 'qrc20' | 'qrc721'> {
-  contract: Pick<ContractCreationAttributes, 'addressString'>
-  qrc20: Pick<Qrc20CreationAttributes, 'name' | 'symbol' | 'decimals'>
-  qrc721: Pick<Qrc721CreationAttributes, 'name' | 'symbol'>
+  contract: Pick<Contract, 'addressString'>
+  qrc20: Pick<QRC20, 'name' | 'symbol' | 'decimals'>
+  qrc721: Pick<QRC721, 'name' | 'symbol'>
 }
 
 interface ContractSpendIODb {
   transactionId: bigint
   value: bigint
-  address: Pick<AddressCreationAttributes, 'type' | 'string'> & {
-    contract: Pick<ContractCreationAttributes, 'address' | 'addressString'>
+  address: Pick<Address, 'type' | 'string'> & {
+    contract: Pick<Contract, 'address' | 'addressString'>
   }
 }
 
@@ -129,7 +106,7 @@ interface ContractSpendDb {
 
 export interface TransactionInputObject
   extends Pick<
-    TransactionInputCreationAttributes,
+    TransactionInput,
     'outputIndex' | 'scriptSig' | 'sequence' | 'value'
   > {
   prevTxId: Buffer
@@ -141,7 +118,7 @@ export interface TransactionInputObject
 }
 
 export interface TransactionOutputObject
-  extends Pick<TransactionOutputCreationAttributes, 'scriptPubKey' | 'value'> {
+  extends Pick<TransactionOutput, 'scriptPubKey' | 'value'> {
   address?: string
   addressHex?: Buffer
   isInvalidContract?: true
@@ -151,10 +128,7 @@ export interface TransactionOutputObject
   refundIndex?: number
   refundValue?: bigint
   isRefund?: true
-  evmReceipt?: Pick<
-    EvmReceiptCreationAttributes,
-    'gasUsed' | 'excepted' | 'exceptedMessage'
-  > & {
+  evmReceipt?: Pick<EVMReceipt, 'gasUsed' | 'excepted' | 'exceptedMessage'> & {
     sender: string
     contractAddress: string
     contractAddressHex: Buffer
@@ -163,20 +137,20 @@ export interface TransactionOutputObject
       addressHex: Buffer
       topics: Buffer[]
       data: Buffer
-      qrc20?: Pick<Qrc20CreationAttributes, 'name' | 'symbol' | 'decimals'>
-      qrc721?: Pick<Qrc721CreationAttributes, 'name' | 'symbol'>
+      qrc20?: Pick<QRC20, 'name' | 'symbol' | 'decimals'>
+      qrc721?: Pick<QRC721, 'name' | 'symbol'>
     }[]
   }
 }
 
 export interface TransactionObject
   extends Pick<
-    TransactionCreationAttributes,
+    Transaction,
     'id' | 'hash' | 'version' | 'flag' | 'lockTime' | 'size' | 'weight'
   > {
   inputs: TransactionInputObject[]
   outputs: TransactionOutputObject[]
-  block?: Pick<HeaderCreationAttributes, 'hash' | 'height' | 'timestamp'>
+  block?: Pick<Header, 'hash' | 'height' | 'timestamp'>
   contractSpendSource?: Buffer
   contractSpends: ContractSpendDb[]
 }
@@ -245,10 +219,7 @@ export interface TransformedTransactionOutputObject {
   isRefund?: true
   spentTxId?: string
   spentIndex?: number
-  receipt?: Pick<
-    EvmReceiptCreationAttributes,
-    'gasUsed' | 'excepted' | 'exceptedMessage'
-  > & {
+  receipt?: Pick<EVMReceipt, 'gasUsed' | 'excepted' | 'exceptedMessage'> & {
     sender: string
     contractAddress: string
     contractAddressHex: string
@@ -262,7 +233,7 @@ export interface TransformedTransactionOutputObject {
 }
 
 export interface Qrc20TransferObject
-  extends Pick<Qrc20CreationAttributes, 'name' | 'symbol' | 'decimals'> {
+  extends Pick<QRC20, 'name' | 'symbol' | 'decimals'> {
   address: string
   addressHex: string
   from: string
@@ -273,7 +244,7 @@ export interface Qrc20TransferObject
 }
 
 export interface Qrc20UnconfirmedTransferObject
-  extends Pick<Qrc20CreationAttributes, 'name' | 'symbol' | 'decimals'> {
+  extends Pick<QRC20, 'name' | 'symbol' | 'decimals'> {
   address: string
   addressHex: string
   from: string
@@ -282,8 +253,7 @@ export interface Qrc20UnconfirmedTransferObject
   value: string
 }
 
-export interface Qrc721TransferObject
-  extends Pick<Qrc721CreationAttributes, 'name' | 'symbol'> {
+export interface Qrc721TransferObject extends Pick<QRC721, 'name' | 'symbol'> {
   address: string
   addressHex: string
   from: string
@@ -294,26 +264,23 @@ export interface Qrc721TransferObject
 }
 
 interface BasicTransactionDb
-  extends Pick<
-    TransactionCreationAttributes,
-    'id' | 'blockHeight' | 'indexInBlock'
-  > {
-  header: Pick<HeaderCreationAttributes, 'hash' | 'timestamp'>
+  extends Pick<Transaction, 'id' | 'blockHeight' | 'indexInBlock'> {
+  header: Pick<Header, 'hash' | 'timestamp'>
 }
 
 interface BasicTransactionInputDb
   extends Pick<
-    TransactionInputCreationAttributes,
+    TransactionInput,
     'value' | 'addressId' | 'outputTransaction' | 'outputIndex'
   > {}
 
 interface BasicTransactionOutputDb
-  extends Pick<TransactionOutputCreationAttributes, 'value' | 'addressId'> {
-  evmReceipt: Pick<EvmReceiptCreationAttributes, '_id'>
+  extends Pick<TransactionOutput, 'value' | 'addressId'> {
+  evmReceipt: Pick<EVMReceipt, '_id'>
   refund: {
-    refundTo: Pick<TransactionOutputCreationAttributes, 'value'>
+    refundTo: Pick<TransactionOutput, 'value'>
   }
-  refundTo: Pick<GasRefundCreationAttributes, 'transactionId'>
+  refundTo: Pick<GasRefund, 'transactionId'>
 }
 
 export interface ValueAndIdTxIO {
@@ -338,21 +305,18 @@ export interface BasicTransactionObject {
 
 interface ContractTxReceiptDb
   extends Omit<EVMReceipt, 'header' | 'transaction' | 'output' | 'contract'> {
-  header: Pick<HeaderCreationAttributes, 'hash' | 'timestamp'>
-  transaction: Pick<TransactionCreationAttributes, 'id'>
-  output: Pick<
-    TransactionOutputCreationAttributes,
-    'scriptPubKey' | 'value'
-  > & {
-    address: Pick<AddressCreationAttributes, 'type' | 'string'> & {
-      contract: Pick<ContractCreationAttributes, 'address' | 'addressString'>
+  header: Pick<Header, 'hash' | 'timestamp'>
+  transaction: Pick<Transaction, 'id'>
+  output: Pick<TransactionOutput, 'scriptPubKey' | 'value'> & {
+    address: Pick<Address, 'type' | 'string'> & {
+      contract: Pick<Contract, 'address' | 'addressString'>
     }
   }
-  contract: Pick<ContractCreationAttributes, 'addressString'>
+  contract: Pick<Contract, 'addressString'>
 }
 
 interface ContractTxLogDb extends Omit<EVMReceiptLog, 'contract'> {
-  contract: Pick<ContractCreationAttributes, 'addressString'>
+  contract: Pick<Contract, 'addressString'>
 }
 
 export interface ContractTransactionObject {
@@ -423,10 +387,9 @@ export interface ITransactionService extends Service {
     receiptId: bigint
   ): Promise<ContractTransactionObject | null>
   transformTopics(
-    log: Pick<
-      EvmReceiptLogCreationAttributes,
-      'topic1' | 'topic2' | 'topic3' | 'topic4'
-    > & { [key: string]: any }
+    log: Pick<EVMReceiptLog, 'topic1' | 'topic2' | 'topic3' | 'topic4'> & {
+      [key: string]: any
+    }
   ): Buffer[]
 }
 
@@ -462,7 +425,7 @@ class TransactionService extends Service implements ITransactionService {
       return null
     }
     const witnesses: Pick<
-      WitnessCreationAttributes,
+      Witness,
       'inputIndex' | 'script'
     >[] = await Witness.findAll({
       where: { transactionId: id },
@@ -963,7 +926,7 @@ class TransactionService extends Service implements ITransactionService {
 
   async getRawTransaction(id: Buffer): Promise<RawTransaction | null> {
     const transaction: Pick<
-      TransactionCreationAttributes,
+      Transaction,
       '_id' | 'version' | 'flag' | 'lockTime'
     > | null = await Transaction.findOne({
       where: { id },
@@ -974,7 +937,7 @@ class TransactionService extends Service implements ITransactionService {
       return null
     }
     const witnesses: Pick<
-      WitnessCreationAttributes,
+      Witness,
       'inputIndex' | 'script'
     >[] = await Witness.findAll({
       where: { transactionId: id },
@@ -987,10 +950,10 @@ class TransactionService extends Service implements ITransactionService {
     })
 
     const inputs: (Pick<
-      TransactionInputCreationAttributes,
+      TransactionInput,
       'outputIndex' | 'scriptSig' | 'sequence'
     > & {
-      outputTransaction: Pick<TransactionCreationAttributes, 'id'>
+      outputTransaction: Pick<Transaction, 'id'>
     })[] = await TransactionInput.findAll({
       where: { transactionId: transaction._id },
       attributes: ['outputIndex', 'scriptSig', 'sequence'],
@@ -1006,7 +969,7 @@ class TransactionService extends Service implements ITransactionService {
       transaction: (this.ctx.state as ContextStateBase).transaction,
     })
     const outputs: Pick<
-      TransactionOutputCreationAttributes,
+      TransactionOutput,
       'value' | 'scriptPubKey'
     >[] = await TransactionOutput.findAll({
       where: { transactionId: transaction._id },
@@ -1129,7 +1092,7 @@ class TransactionService extends Service implements ITransactionService {
 
   async getMempoolTransactionAddresses(id: Buffer): Promise<string[]> {
     const balanceChanges: {
-      address: Pick<AddressCreationAttributes, 'string'>
+      address: Pick<Address, 'string'>
     }[] = await BalanceChange.findAll({
       attributes: [],
       include: [
@@ -1150,7 +1113,7 @@ class TransactionService extends Service implements ITransactionService {
       transaction: (this.ctx.state as ContextStateBase).transaction,
     })
     const receipts: Pick<
-      EvmReceiptCreationAttributes,
+      EVMReceipt,
       'senderType' | 'senderData'
     >[] = await EVMReceipt.findAll({
       attributes: ['senderType', 'senderData'],
@@ -1845,10 +1808,9 @@ class TransactionService extends Service implements ITransactionService {
   }
 
   transformTopics(
-    log: Pick<
-      EvmReceiptLogCreationAttributes,
-      'topic1' | 'topic2' | 'topic3' | 'topic4'
-    > & { [key: string]: any }
+    log: Pick<EVMReceiptLog, 'topic1' | 'topic2' | 'topic3' | 'topic4'> & {
+      [key: string]: any
+    }
   ): Buffer[] {
     const result = []
     if (log.topic1) {

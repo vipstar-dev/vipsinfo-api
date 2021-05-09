@@ -8,27 +8,15 @@ import {
   OutputScript,
   qrc20ABIs,
 } from 'vipsinfo/lib'
-import Contract, {
-  ContractCreationAttributes,
-} from 'vipsinfo/node/models/contract'
-import EVMReceipt, {
-  EvmReceiptCreationAttributes,
-} from 'vipsinfo/node/models/evm-receipt'
-import EVMReceiptLog, {
-  EvmReceiptLogCreationAttributes,
-} from 'vipsinfo/node/models/evm-receipt-log'
+import Contract from 'vipsinfo/node/models/contract'
+import EVMReceipt from 'vipsinfo/node/models/evm-receipt'
+import EVMReceiptLog from 'vipsinfo/node/models/evm-receipt-log'
 import Header, { HeaderCreationAttributes } from 'vipsinfo/node/models/header'
 import QRC20, { Qrc20CreationAttributes } from 'vipsinfo/node/models/qrc20'
-import QRC20Statistics, {
-  Qrc20StatisticsCreationAttributes,
-} from 'vipsinfo/node/models/qrc20-statistics'
-import QRC721, { Qrc721CreationAttributes } from 'vipsinfo/node/models/qrc721'
-import Transaction, {
-  TransactionCreationAttributes,
-} from 'vipsinfo/node/models/transaction'
-import TransactionOutput, {
-  TransactionOutputCreationAttributes,
-} from 'vipsinfo/node/models/transaction-output'
+import QRC20Statistics from 'vipsinfo/node/models/qrc20-statistics'
+import QRC721 from 'vipsinfo/node/models/qrc721'
+import Transaction from 'vipsinfo/node/models/transaction'
+import TransactionOutput from 'vipsinfo/node/models/transaction-output'
 import { sql } from 'vipsinfo/node/utils'
 import RpcClient, { CallContractResult } from 'vipsinfo/rpc'
 
@@ -37,27 +25,27 @@ import { AllQRC721Balances } from '@/app/service/qrc721'
 const { in: $in } = Op
 
 interface ContractSummaryDb
-  extends Pick<ContractCreationAttributes, 'addressString' | 'vm' | 'type'> {
+  extends Pick<Contract, 'addressString' | 'vm' | 'type'> {
   qrc20: Pick<
     Qrc20CreationAttributes,
     'name' | 'symbol' | 'decimals' | 'totalSupply' | 'version'
   > & {
     statistics: QRC20Statistics
   }
-  qrc721: Pick<Qrc721CreationAttributes, 'name' | 'symbol' | 'totalSupply'>
+  qrc721: Pick<QRC721, 'name' | 'symbol' | 'totalSupply'>
 }
 
 export interface ContractSummaryObject {
   address: string
   addressHex: Buffer
-  vm: ContractCreationAttributes['vm']
-  type: ContractCreationAttributes['type']
+  vm: Contract['vm']
+  type: Contract['type']
   qrc20?: Omit<
     Qrc20CreationAttributes,
     'contractAddress' | 'contract' | 'logs' | 'statistics'
   > &
-    Pick<Qrc20StatisticsCreationAttributes, 'holders' | 'transactions'>
-  qrc721?: Pick<Qrc721CreationAttributes, 'name' | 'symbol' | 'totalSupply'>
+    Pick<QRC20Statistics, 'holders' | 'transactions'>
+  qrc721?: Pick<QRC721, 'name' | 'symbol' | 'totalSupply'>
   balance: bigint
   totalReceived: bigint
   totalSent: bigint
@@ -79,12 +67,12 @@ interface ContractBasicTxsReceiptDb
     'header' | 'transaction' | 'output' | 'logs' | 'contract'
   > {
   header: Pick<HeaderCreationAttributes, 'hash' | 'timestamp'>
-  transaction: Pick<TransactionCreationAttributes, 'id'>
-  output: Pick<TransactionOutputCreationAttributes, 'scriptPubKey' | 'value'>
+  transaction: Pick<Transaction, 'id'>
+  output: Pick<TransactionOutput, 'scriptPubKey' | 'value'>
   logs: (Omit<EVMReceiptLog, 'contract'> & {
-    contract: Pick<ContractCreationAttributes, 'addressString'>
+    contract: Pick<Contract, 'addressString'>
   })[]
-  contract: Pick<ContractCreationAttributes, 'addressString'>
+  contract: Pick<Contract, 'addressString'>
 }
 
 export interface ContractBasicTx {
@@ -123,23 +111,23 @@ export type SearchLogsArgs = Partial<
 
 interface SearchLogsDb
   extends Pick<
-    EvmReceiptLogCreationAttributes,
+    EVMReceiptLog,
     'topic1' | 'topic2' | 'topic3' | 'topic4' | 'data'
   > {
   receipt: Pick<
-    EvmReceiptCreationAttributes,
+    EVMReceipt,
     | 'transactionId'
     | 'outputIndex'
     | 'blockHeight'
     | 'senderType'
     | 'senderData'
   > & {
-    transaction: Pick<TransactionCreationAttributes, 'id'> & {
-      header: Pick<HeaderCreationAttributes, 'hash' | 'height' | 'timestamp'>
+    transaction: Pick<Transaction, 'id'> & {
+      header: Pick<Header, 'hash' | 'height' | 'timestamp'>
     }
-    contract: Pick<ContractCreationAttributes, 'address' | 'addressString'>
+    contract: Pick<Contract, 'address' | 'addressString'>
   }
-  contract: Pick<ContractCreationAttributes, 'address' | 'addressString'>
+  contract: Pick<Contract, 'address' | 'addressString'>
 }
 
 export interface SearchLog {
@@ -217,7 +205,7 @@ class ContractService extends Service implements IContractService {
         this.ctx.throw(400)
       }
       const contractResult: Pick<
-        ContractCreationAttributes,
+        Contract,
         'address' | 'addressString' | 'vm' | 'type'
       > | null = await Contract.findOne({
         where: filter,
@@ -722,7 +710,7 @@ class ContractService extends Service implements IContractService {
     )
 
     const contracts: Pick<
-      ContractCreationAttributes,
+      Contract,
       'address' | 'addressString'
     >[] = await Contract.findAll({
       where: {

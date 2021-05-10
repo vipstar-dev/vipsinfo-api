@@ -357,7 +357,7 @@ export interface ITransactionService extends Service {
   sendRawTransaction(data: Buffer): Promise<Buffer | undefined>
   transformTransaction(
     transaction: TransactionObject,
-    object: BriefOption
+    object?: BriefOption
   ): Promise<TransformedTransactionObject>
   transformInput(
     input: TransactionInputObject,

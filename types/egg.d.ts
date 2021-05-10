@@ -5,6 +5,7 @@ import { chainType, IAddress, IChain } from 'vipsinfo/lib'
 import { ITip } from 'vipsinfo/node/services/db'
 import { RpcClientConfig } from 'vipsinfo/rpc'
 
+import { IAddressController } from '@/app/controller/address'
 import { IBlockController } from '@/app/controller/block'
 import { IContractController } from '@/app/controller/contract'
 import { IInfoController } from '@/app/controller/info'
@@ -38,6 +39,7 @@ declare module 'egg' {
   }
 
   interface IController {
+    address: IAddressController
     block: IBlockController
     contract: IContractController
     info: IInfoController

@@ -5,6 +5,7 @@ import { chainType, IAddress, IChain } from 'vipsinfo/lib'
 import { ITip } from 'vipsinfo/node/services/db'
 import { RpcClientConfig } from 'vipsinfo/rpc'
 
+import { IInfoController } from '@/app/controller/info'
 import { IMiscController } from '@/app/controller/misc'
 import { IQRC20Controller } from '@/app/controller/qrc20'
 import { IQRC721Controller } from '@/app/controller/qrc721'
@@ -35,6 +36,7 @@ declare module 'egg' {
   }
 
   interface IController {
+    info: IInfoController
     misc: IMiscController
     qrc20: IQRC20Controller
     qrc721: IQRC721Controller

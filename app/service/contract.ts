@@ -3,6 +3,8 @@ import { col, Op, QueryTypes, where } from 'sequelize'
 import {
   Address as RawAddress,
   IAddress,
+  IEVMContractCallBySenderScript,
+  IEVMContractCallScript,
   IMethodABI,
   IOutputScript,
   OutputScript,
@@ -82,7 +84,7 @@ export interface ContractBasicTx {
   blockHash?: Buffer
   timestamp?: number
   confirmations: number
-  scriptPubKey: IOutputScript
+  scriptPubKey: IEVMContractCallScript | IEVMContractCallBySenderScript
   value: bigint
   sender: IAddress
   gasUsed: number
@@ -105,7 +107,7 @@ export interface ContractBasicTxsObject {
 
 export type SearchLogsArgs = Partial<
   {
-    [key in 'contract' | 'topic1' | 'topic2' | 'topic3' | 'topic4']: Buffer
+    [key in 'contract' | 'topic1' | 'topic2' | 'topic3' | 'topic4']: Buffer | null
   }
 >
 
@@ -531,7 +533,9 @@ class ContractService extends Service implements IContractService {
               1,
           }
         : { confirmations: 0 }),
-      scriptPubKey: OutputScript.fromBuffer(receipt.output.scriptPubKey),
+      scriptPubKey: OutputScript.fromBuffer(receipt.output.scriptPubKey) as
+        | IEVMContractCallScript
+        | IEVMContractCallBySenderScript,
       value: receipt.output.value,
       sender: new RawAddress({
         type: receipt.senderType,

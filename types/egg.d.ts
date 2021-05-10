@@ -5,6 +5,7 @@ import { chainType, IAddress, IChain } from 'vipsinfo/lib'
 import { ITip } from 'vipsinfo/node/services/db'
 import { RpcClientConfig } from 'vipsinfo/rpc'
 
+import { IQRC20Controller } from '@/app/controller/qrc20'
 import { IQRC721Controller } from '@/app/controller/qrc721'
 import { IStatisticsController } from '@/app/controller/statistics'
 import { ITransactionController } from '@/app/controller/transaction'
@@ -33,6 +34,7 @@ declare module 'egg' {
   }
 
   interface IController {
+    qrc20: IQRC20Controller
     qrc721: IQRC721Controller
     statistics: IStatisticsController
     transaction: ITransactionController

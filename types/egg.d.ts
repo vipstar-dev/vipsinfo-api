@@ -5,6 +5,7 @@ import { ITip } from 'vipsinfo/node/services/db'
 import { RpcClientConfig } from 'vipsinfo/rpc'
 
 import { ContractObject } from '@/app/middleware/contract'
+import { IAddressService } from '@/app/service/address'
 import { IBalanceService } from '@/app/service/balance'
 import { IBlockService } from '@/app/service/block'
 import { IContractService } from '@/app/service/contract'
@@ -26,6 +27,7 @@ declare module 'egg' {
   }
 
   interface IService {
+    address: IAddressService
     balance: IBalanceService
     block: IBlockService
     contract: IContractService

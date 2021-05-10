@@ -5,6 +5,7 @@ import { chainType, IAddress, IChain } from 'vipsinfo/lib'
 import { ITip } from 'vipsinfo/node/services/db'
 import { RpcClientConfig } from 'vipsinfo/rpc'
 
+import { IStatisticsController } from '@/app/controller/statistics'
 import { ITransactionController } from '@/app/controller/transaction'
 import { ContractObject } from '@/app/middleware/contract'
 import { PaginationConstructor } from '@/app/middleware/pagination'
@@ -31,6 +32,7 @@ declare module 'egg' {
   }
 
   interface IController {
+    statistics: IStatisticsController
     transaction: ITransactionController
   }
 

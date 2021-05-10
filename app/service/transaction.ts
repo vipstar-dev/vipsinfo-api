@@ -325,7 +325,7 @@ export interface ContractTransactionObject {
   blockHeight?: number
   blockHash?: Buffer
   timestamp?: number
-  scriptPubKey: IOutputScript
+  scriptPubKey: IEVMContractCallScript | IEVMContractCallBySenderScript
   value: bigint
   outputAddress: string
   outputAddressHex: Buffer
@@ -1783,7 +1783,9 @@ class TransactionService extends Service implements ITransactionService {
             blockHash: receipt.header.hash,
             timestamp: receipt.header.timestamp,
           }),
-      scriptPubKey: OutputScript.fromBuffer(receipt.output.scriptPubKey),
+      scriptPubKey: OutputScript.fromBuffer(receipt.output.scriptPubKey) as
+        | IEVMContractCallScript
+        | IEVMContractCallBySenderScript,
       value: receipt.output.value,
       outputAddress,
       outputAddressHex,

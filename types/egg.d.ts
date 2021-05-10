@@ -1,3 +1,4 @@
+import { Middleware } from 'koa'
 import { MiddlewareOptions } from 'koa-ratelimit'
 import { Transaction as SequelizeTransaction } from 'sequelize'
 import { chainType, IAddress, IChain } from 'vipsinfo/lib'
@@ -6,6 +7,8 @@ import { RpcClientConfig } from 'vipsinfo/rpc'
 
 import { ITransactionController } from '@/app/controller/transaction'
 import { ContractObject } from '@/app/middleware/contract'
+import { PaginationConstructor } from '@/app/middleware/pagination'
+import { CustomMiddlewareOptions } from '@/app/middleware/ratelimit'
 import { IAddressService } from '@/app/service/address'
 import { IBalanceService } from '@/app/service/balance'
 import { IBlockService } from '@/app/service/block'
@@ -29,6 +32,31 @@ declare module 'egg' {
 
   interface IController {
     transaction: ITransactionController
+  }
+
+  interface IMiddleware {
+    address(): (
+      ctx: CustomContextForAddress,
+      next: CallableFunction
+    ) => Promise<void>
+    blockFilter(): (
+      ctx: CustomContextForBlockFilter,
+      next: CallableFunction
+    ) => Promise<void>
+    contract(
+      paramName?: string
+    ): (ctx: CustomContextForContract, next: CallableFunction) => Promise<void>
+    pagination(
+      object?: PaginationConstructor
+    ): (
+      ctx: CustomContextForPagination,
+      next: CallableFunction
+    ) => Promise<void>
+    ratelimit(options: CustomMiddlewareOptions, app: Application): Middleware
+    transaction(): (
+      ctx: CustomContextBase,
+      next: CallableFunction
+    ) => Promise<void>
   }
 
   interface IService {

@@ -13,7 +13,7 @@ export interface ContractObject {
   addressIds: bigint[]
 }
 
-interface AddressFilter {
+export interface AddressFilter {
   address?: Buffer
   addressString?: string
 }

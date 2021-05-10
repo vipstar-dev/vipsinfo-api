@@ -1,6 +1,6 @@
 import { CustomContextForPagination } from 'egg'
 
-interface PaginationObject {
+export interface PaginationObject {
   limit?: string
   offset?: string
   pageSize?: string
@@ -12,7 +12,7 @@ interface PaginationObject {
   [key: string]: any
 }
 
-interface PaginationConstructor {
+export interface PaginationConstructor {
   defaultPageSize: number
 }
 

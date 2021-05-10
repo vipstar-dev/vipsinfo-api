@@ -5,7 +5,7 @@ interface WhiteListAnyMiddlewareOptions extends MiddlewareOptions {
   whitelist: any
 }
 
-interface CustomMiddlewareOptions extends WhiteListAnyMiddlewareOptions {
+export interface CustomMiddlewareOptions extends WhiteListAnyMiddlewareOptions {
   whitelist: string[]
 }
 

@@ -148,7 +148,7 @@ export interface Qrc20BalanceHistoryObject {
   transactions: BalanceHistoryResult[]
 }
 
-interface TokenTransactionDb
+export interface TokenTransactionDb
   extends Pick<EVMReceipt, 'outputIndex' | 'blockHeight'>,
     Pick<Header, 'timestamp'>,
     Pick<QRC20, 'name' | 'symbol' | 'decimals'>,

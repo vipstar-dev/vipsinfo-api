@@ -96,7 +96,6 @@ declare module 'egg' {
     vips: {
       chain: chainType
     }
-    cmcAPIKey: string | null
     // egg-socket.io config
     io: {
       redis: {

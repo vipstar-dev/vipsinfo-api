@@ -63,12 +63,11 @@ export default (appInfo: EggAppConfig): PowerPartial<EggAppConfig> => {
     rpc: {
       protocol: 'http',
       host: 'localhost',
-      port: 3889,
+      port: 31915,
       user: 'user',
       password: 'password',
     },
   }
 
-  config.cmcAPIKey = null
   return config
 }

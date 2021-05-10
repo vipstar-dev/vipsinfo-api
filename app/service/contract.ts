@@ -107,7 +107,12 @@ export interface ContractBasicTxsObject {
 
 export type SearchLogsArgs = Partial<
   {
-    [key in 'contract' | 'topic1' | 'topic2' | 'topic3' | 'topic4']: Buffer | null
+    [key in
+      | 'contract'
+      | 'topic1'
+      | 'topic2'
+      | 'topic3'
+      | 'topic4']: Buffer | null
   }
 >
 

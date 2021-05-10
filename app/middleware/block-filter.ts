@@ -51,7 +51,9 @@ export default function blockFilter() {
       }
     }
     if ('toTime' in blockFilterObject) {
-      const timestamp = Math.floor(Date.parse(blockFilterObject.toTime as string) / 1000)
+      const timestamp = Math.floor(
+        Date.parse(blockFilterObject.toTime as string) / 1000
+      )
       ctx.assert(timestamp >= 0 && timestamp <= 0xffffffff, 400)
       const header = await Header.findOne({
         where: { timestamp: { [$lte]: timestamp } },

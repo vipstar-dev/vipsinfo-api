@@ -1,5 +1,5 @@
 import { CustomContextForAddress } from 'egg'
-import { Op } from 'sequelize'
+import { Op, Transaction as SequelizeTransaction } from 'sequelize'
 import { Address as RawAddress, IAddress } from 'vipsinfo/lib'
 import Address from 'vipsinfo/node/models/address'
 
@@ -21,7 +21,7 @@ export default function address() {
     const result = await Address.findAll({
       where: { string: { [$in]: addresses } },
       attributes: ['_id', 'type', 'data'],
-      transaction: ctx.state.transaction,
+      transaction: ctx.state.transaction as SequelizeTransaction,
     })
     ctx.state.address = {
       rawAddresses,

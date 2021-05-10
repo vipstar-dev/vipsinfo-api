@@ -13,7 +13,9 @@ export interface ITransactionController {
   send(): Promise<void>
 }
 
-class TransactionController extends Controller implements ITransactionController {
+class TransactionController
+  extends Controller
+  implements ITransactionController {
   async transaction(): Promise<void> {
     const ctx = this.ctx as CustomContextForTransaction
     ctx.assert(ctx.params.id && /^[0-9a-f]{64}$/i.test(ctx.params.id), 404)

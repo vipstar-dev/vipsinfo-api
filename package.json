@@ -8,7 +8,7 @@
     "start": "egg-scripts start --title=vipsinfo-api --sticky --daemon",
     "stop": "egg-scripts stop --title=vipsinfo-api",
     "dev": "egg-bin dev",
-    "lint": "eslint --ext .js app config"
+    "lint": "eslint --ext .js,.ts --ignore-path .gitignore ."
   },
   "dependencies": {
     "egg": "^2.23.0",

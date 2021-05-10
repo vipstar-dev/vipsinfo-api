@@ -41,7 +41,6 @@ export interface IStatisticsService extends Service {
   getAddressGrowth(): Promise<AddressGrowthObject[]>
 }
 
-
 class StatisticsService extends Service implements IStatisticsService {
   async getDailyTransactions(): Promise<DailyTransactionsObject[]> {
     const db = this.ctx.model

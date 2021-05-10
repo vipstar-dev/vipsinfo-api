@@ -5,6 +5,7 @@ import { chainType, IAddress, IChain } from 'vipsinfo/lib'
 import { ITip } from 'vipsinfo/node/services/db'
 import { RpcClientConfig } from 'vipsinfo/rpc'
 
+import { IBlockController } from '@/app/controller/block'
 import { IContractController } from '@/app/controller/contract'
 import { IInfoController } from '@/app/controller/info'
 import { IMiscController } from '@/app/controller/misc'
@@ -37,6 +38,7 @@ declare module 'egg' {
   }
 
   interface IController {
+    block: IBlockController
     contract: IContractController
     info: IInfoController
     misc: IMiscController
@@ -156,6 +158,9 @@ declare module 'egg' {
   }
 
   export interface CustomContextForBlockFilter extends CustomContextBase {
+    params: {
+      block: string
+    }
     state: ContextStateForBlockFilter
   }
 

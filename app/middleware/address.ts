@@ -10,10 +10,10 @@ export default function address() {
     ctx.assert(ctx.params.address, 404)
     const chain = ctx.app.chain
     const addresses: string[] = ctx.params.address.split(',')
-    const rawAddresses: (IAddress | undefined)[] = []
+    const rawAddresses: IAddress[] = []
     for (const address of addresses) {
       try {
-        rawAddresses.push(RawAddress.fromString(address, chain))
+        rawAddresses.push(RawAddress.fromString(address, chain) as IAddress)
       } catch (err) {
         ctx.throw(400)
       }

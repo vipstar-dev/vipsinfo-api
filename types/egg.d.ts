@@ -115,7 +115,7 @@ declare module 'egg' {
   }
 
   interface StateAddress {
-    rawAddresses: (IAddress | undefined)[]
+    rawAddresses: IAddress[]
     addressIds: bigint[]
     p2pkhAddressIds: bigint[]
   }

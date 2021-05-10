@@ -78,7 +78,7 @@ export interface IBalanceService extends Service {
   getMatureBalance(ids: bigint[]): Promise<bigint>
   getBalanceHistory(
     ids: bigint[],
-    object: { nonZero: boolean }
+    object?: { nonZero: boolean }
   ): Promise<BalanceHistoryObject>
   getRichList(): Promise<RichListObject>
   updateRichList(): Promise<void>

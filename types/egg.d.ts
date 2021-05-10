@@ -4,6 +4,7 @@ import { chainType, IAddress, IChain } from 'vipsinfo/lib'
 import { ITip } from 'vipsinfo/node/services/db'
 import { RpcClientConfig } from 'vipsinfo/rpc'
 
+import { ITransactionController } from '@/app/controller/transaction'
 import { ContractObject } from '@/app/middleware/contract'
 import { IAddressService } from '@/app/service/address'
 import { IBalanceService } from '@/app/service/balance'
@@ -24,6 +25,10 @@ declare module 'egg' {
     }
     [CHAIN]: IChain | undefined
     chain: IChain
+  }
+
+  interface IController {
+    transaction: ITransactionController
   }
 
   interface IService {
@@ -123,5 +128,12 @@ declare module 'egg' {
 
   export interface CustomContextForPagination extends CustomContextBase {
     state: ContextStateForPagination
+  }
+
+  export interface CustomContextForTransaction extends CustomContextBase {
+    params: {
+      id?: string
+      ids?: string
+    }
   }
 }

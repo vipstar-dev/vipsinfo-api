@@ -63,7 +63,7 @@ export default (appInfo: EggAppConfig): PowerPartial<EggAppConfig> => {
     rpc: {
       protocol: 'http',
       host: 'localhost',
-      port: 31915,
+      port: 31916,
       user: 'user',
       password: 'password',
     },

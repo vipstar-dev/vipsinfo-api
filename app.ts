@@ -3,6 +3,10 @@ import { ITip } from 'vipsinfo/node/services/db'
 
 /* eslint-disable @typescript-eslint/no-misused-promises */
 export default (app: Application) => {
+  app.beforeStart(async () => {
+    await Promise.resolve('egg + ts')
+  })
+
   app.blockchainInfo = {
     tip: null,
   }

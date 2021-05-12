@@ -73,8 +73,8 @@ class StatisticsService extends Service implements IStatisticsService {
     const db = this.ctx.model
     const result: BlockIntervalStatisticsDb[] = await db.query(
       sql`
-      SELECT header.timestamp - prev_header.timestamp AS blockInterval, COUNT(*) AS count FROM header
-      INNER JOIN header prev_header ON prev_header.height = header.height - 1
+      SELECT CAST(header.timestamp AS SIGNED) - CAST(prev_header.timestamp AS SIGNED) AS blockInterval, COUNT(*) AS count FROM header
+      INNER JOIN header prev_header ON prev_header.height = CAST(header.height AS SIGNED) - 1
       GROUP BY blockInterval
       ORDER BY blockInterval ASC
     `,

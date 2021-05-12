@@ -651,12 +651,12 @@ class AddressService extends Service implements IAddressService {
               transactionId: where(
                 col('output.transaction_id'),
                 '=',
-                col('evm_receipt.transaction_id')
+                col('EvmReceipt.transaction_id')
               ),
               outputIndex: where(
                 col('output.output_index'),
                 '=',
-                col('evm_receipt.output_index')
+                col('EvmReceipt.output_index')
               ),
             },
             required: true,

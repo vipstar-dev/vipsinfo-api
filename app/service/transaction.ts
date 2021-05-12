@@ -453,12 +453,12 @@ class TransactionService extends Service implements ITransactionService {
             transactionId: where(
               col('output.transaction_id'),
               '=',
-              col('transaction_input.output_id')
+              col('TransactionInput.output_id')
             ),
             outputIndex: where(
               col('output.output_index'),
               '=',
-              col('transaction_input.output_index')
+              col('TransactionInput.output_index')
             ),
           },
           required: false,
@@ -498,12 +498,12 @@ class TransactionService extends Service implements ITransactionService {
             transactionId: where(
               col('input.transaction_id'),
               '=',
-              col('transaction_output.input_id')
+              col('TransactionOutput.input_id')
             ),
             outputIndex: where(
               col('input.input_index'),
               '=',
-              col('transaction_output.input_index')
+              col('TransactionOutput.input_index')
             ),
           },
           required: false,
@@ -535,7 +535,7 @@ class TransactionService extends Service implements ITransactionService {
             outputIndex: where(
               col('refund.output_index'),
               '=',
-              col('transaction_output.output_index')
+              col('TransactionOutput.output_index')
             ),
           },
           required: false,
@@ -579,7 +579,7 @@ class TransactionService extends Service implements ITransactionService {
             outputIndex: where(
               col('refundTo.refund_index'),
               '=',
-              col('transaction_output.output_index')
+              col('TransactionOutput.output_index')
             ),
           },
           required: false,
@@ -605,7 +605,7 @@ class TransactionService extends Service implements ITransactionService {
             outputIndex: where(
               col('evmReceipt.output_index'),
               '=',
-              col('transaction_output.output_index')
+              col('TransactionOutput.output_index')
             ),
           },
           required: false,
@@ -1524,12 +1524,12 @@ class TransactionService extends Service implements ITransactionService {
               transactionId: where(
                 col('evmReceipt.transaction_id'),
                 '=',
-                col('transaction_output.transaction_id')
+                col('TransactionOutput.transaction_id')
               ),
               outputIndex: where(
                 col('evmReceipt.output_index'),
                 '=',
-                col('transaction_output.output_index')
+                col('TransactionOutput.output_index')
               ),
             },
             required: false,
@@ -1547,7 +1547,7 @@ class TransactionService extends Service implements ITransactionService {
               outputIndex: where(
                 col('refund.output_index'),
                 '=',
-                col('transaction_output.output_index')
+                col('TransactionOutput.output_index')
               ),
             },
             required: false,
@@ -1585,7 +1585,7 @@ class TransactionService extends Service implements ITransactionService {
               outputIndex: where(
                 col('refundTo.refund_index'),
                 '=',
-                col('transaction_output.output_index')
+                col('TransactionOutput.output_index')
               ),
             },
             required: false,
@@ -1704,12 +1704,12 @@ class TransactionService extends Service implements ITransactionService {
             transactionId: where(
               col('output.transaction_id'),
               '=',
-              col('evm_receipt.transaction_id')
+              col('EvmReceipt.transaction_id')
             ),
             outputIndex: where(
               col('output.output_index'),
               '=',
-              col('evm_receipt.output_index')
+              col('EvmReceipt.output_index')
             ),
           },
           required: true,

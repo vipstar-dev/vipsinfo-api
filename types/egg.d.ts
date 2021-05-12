@@ -35,7 +35,7 @@ declare module 'egg' {
       tip: ITip | null
     }
     [CHAIN]: IChain | undefined
-    chain: IChain
+    chain(): IChain
   }
 
   interface IController {

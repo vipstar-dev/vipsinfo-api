@@ -21,7 +21,7 @@ export interface AddressFilter {
 export default function contract(paramName: string = 'contract') {
   return async (ctx: CustomContextForContract, next: CallableFunction) => {
     ctx.assert(ctx.params[paramName], 404)
-    const chain = ctx.app.chain
+    const chain = ctx.app.chain()
 
     const contract: Partial<ContractObject> = {}
     let rawAddress: IAddress | undefined

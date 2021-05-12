@@ -197,7 +197,7 @@ class ContractController extends Controller implements IContractController {
     ctx.assert(/^([0-9a-f]{2})+$/i.test(data), 400)
     if (sender != null) {
       try {
-        const address = Address.fromString(sender, this.app.chain)
+        const address = Address.fromString(sender, this.app.chain())
         if (
           [
             Address.PAY_TO_PUBLIC_KEY_HASH,

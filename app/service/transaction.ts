@@ -808,7 +808,7 @@ class TransactionService extends Service implements ITransactionService {
             } else {
               const address = RawAddress.fromString(
                 input.address.string,
-                this.app.chain
+                this.app.chain()
               ) as IAddress
               inputObject.address = address.data?.toString('hex')
               inputObject.addressHex = address.data
@@ -839,7 +839,7 @@ class TransactionService extends Service implements ITransactionService {
             } else {
               const address = RawAddress.fromString(
                 output.address.string,
-                this.app.chain
+                this.app.chain()
               ) as IAddress
               outputObject.address = address.data?.toString('hex')
               outputObject.addressHex = address.data
@@ -866,7 +866,7 @@ class TransactionService extends Service implements ITransactionService {
             sender: new RawAddress({
               type: output.evmReceipt.senderType,
               data: output.evmReceipt.senderData,
-              chain: this.app.chain,
+              chain: this.app.chain(),
             }).toString() as string,
             gasUsed: output.evmReceipt.gasUsed,
             contractAddress: output.evmReceipt.contractAddress.toString('hex'),
@@ -1134,7 +1134,7 @@ class TransactionService extends Service implements ITransactionService {
         new RawAddress({
           type: receipt.senderType,
           data: receipt.senderData,
-          chain: this.app.chain,
+          chain: this.app.chain(),
         }).toString() as string
       )
     }
@@ -1766,7 +1766,7 @@ class TransactionService extends Service implements ITransactionService {
     } else {
       const address = RawAddress.fromString(
         receipt.output.address.string,
-        this.app.chain
+        this.app.chain()
       ) as IAddress
       outputAddress = address.data?.toString('hex') as string
       outputAddressHex = address.data as Buffer
@@ -1793,7 +1793,7 @@ class TransactionService extends Service implements ITransactionService {
       sender: new RawAddress({
         type: receipt.senderType,
         data: receipt.senderData,
-        chain: this.app.chain,
+        chain: this.app.chain(),
       }),
       gasUsed: receipt.gasUsed,
       contractAddress: receipt.contractAddress.toString('hex'),

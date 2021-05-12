@@ -8,7 +8,7 @@ const { in: $in } = Op
 export default function address() {
   return async (ctx: CustomContextForAddress, next: CallableFunction) => {
     ctx.assert(ctx.params.address, 404)
-    const chain = ctx.app.chain
+    const chain = ctx.app.chain()
     const addresses: string[] = ctx.params.address.split(',')
     const rawAddresses: IAddress[] = []
     for (const address of addresses) {

@@ -532,7 +532,7 @@ class BlockService extends Service implements IBlockService {
         new RawAddress({
           type: senderType,
           data: senderData,
-          chain: this.app.chain,
+          chain: this.app.chain(),
         }).toString() as string
       )
     }
@@ -577,14 +577,14 @@ class BlockService extends Service implements IBlockService {
               new RawAddress({
                 type: RawAddress.PAY_TO_PUBLIC_KEY_HASH,
                 data: sender,
-                chain: this.app.chain,
+                chain: this.app.chain(),
               }).toString() as string
             )
             set.add(
               new RawAddress({
                 type: RawAddress.EVM_CONTRACT,
                 data: sender,
-                chain: this.app.chain,
+                chain: this.app.chain(),
               }).toString() as string
             )
           }
@@ -593,14 +593,14 @@ class BlockService extends Service implements IBlockService {
               new RawAddress({
                 type: RawAddress.PAY_TO_PUBLIC_KEY_HASH,
                 data: receiver,
-                chain: this.app.chain,
+                chain: this.app.chain(),
               }).toString() as string
             )
             set.add(
               new RawAddress({
                 type: RawAddress.EVM_CONTRACT,
                 data: receiver,
-                chain: this.app.chain,
+                chain: this.app.chain(),
               }).toString() as string
             )
           }

@@ -61,7 +61,7 @@ class MiscService extends Service implements IMiscService {
     }
 
     try {
-      const address = Address.fromString(id, this.app.chain)
+      const address = Address.fromString(id, this.app.chain())
       if (
         address &&
         [Address.CONTRACT, Address.EVM_CONTRACT].includes(

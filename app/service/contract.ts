@@ -193,7 +193,7 @@ export interface IContractService extends Service {
 
 class ContractService extends Service implements IContractService {
   async getContractAddresses(list: string[]): Promise<Buffer[]> {
-    const chain = this.app.chain
+    const chain = this.app.chain()
 
     const result: Buffer[] = []
     for (const item of list) {
@@ -545,7 +545,7 @@ class ContractService extends Service implements IContractService {
       sender: new RawAddress({
         type: receipt.senderType,
         data: receipt.senderData,
-        chain: this.app.chain,
+        chain: this.app.chain(),
       }) as IAddress,
       gasUsed: receipt.gasUsed,
       contractAddress: receipt.contractAddress.toString('hex'),
@@ -696,7 +696,7 @@ class ContractService extends Service implements IContractService {
         sender: new RawAddress({
           type: log.receipt.senderType,
           data: log.receipt.senderData,
-          chain: this.app.chain,
+          chain: this.app.chain(),
         }),
         contractAddress: log.receipt.contract.address.toString('hex'),
         contractAddressHex: log.receipt.contract.address,
@@ -749,7 +749,7 @@ class ContractService extends Service implements IContractService {
             new RawAddress({
               type: RawAddress.PAY_TO_PUBLIC_KEY_HASH,
               data: mappedAddress,
-              chain: this.app.chain,
+              chain: this.app.chain(),
             }).toString() as string
           )
         }

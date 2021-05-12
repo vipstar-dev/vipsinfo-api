@@ -65,7 +65,7 @@ export default (appInfo: EggAppConfig): PowerPartial<EggAppConfig> => {
       host: 'localhost',
       port: 31916,
       user: 'user',
-      password: 'password',
+      password: 'pass',
     },
   }
 

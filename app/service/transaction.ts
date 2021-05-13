@@ -1066,16 +1066,21 @@ class TransactionService extends Service implements ITransactionService {
     const db = this.ctx.model
     const { limit, offset } = (this.ctx
       .state as ContextStateForPagination).pagination
+    const dbPowBlocks: Pick<Header, 'height'>[] = await Header.findAll({
+      where: {
+        stakeOutputIndex: 0xffffffff,
+        stakePrevTxId: Buffer.alloc(32),
+      },
+      attributes: ['height'],
+    })
+    const powBlocks = dbPowBlocks
+      .map(({ height }) => height)
+      .slice(dbPowBlocks.length - offset, dbPowBlocks.length - offset + limit)
     const list: { id: Buffer }[] = await db.query(
       sql`
       SELECT transaction.id AS id FROM transaction, (
-        SELECT _id FROM transaction, (
-          SELECT stake_prev_tx_id, stake_output_index FROM header
-          WHERE height = transaction.block_height
-        ) header
-        WHERE block_height > 0 AND ((header.stake_prev_tx_id = ${Buffer.alloc(
-          32
-        )} AND header.stake_output_index = ${0xffffffff}) OR index_in_block > 0)
+        SELECT _id FROM transaction
+        WHERE block_height > 0 AND (block_height IN ${powBlocks} OR index_in_block > 0)
         ORDER BY block_height DESC, index_in_block DESC, _id DESC
         LIMIT ${offset}, ${limit}
       ) list

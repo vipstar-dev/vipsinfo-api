@@ -1151,7 +1151,7 @@ class TransactionService extends Service implements ITransactionService {
 
   async transformTransaction(
     transaction: TransactionObject,
-    { brief = false }: BriefOption
+    { brief }: BriefOption = { brief: false }
   ): Promise<TransformedTransactionObject> {
     const confirmations = transaction.block
       ? (this.app.blockchainInfo.tip?.height as number) -

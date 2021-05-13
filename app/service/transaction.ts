@@ -1014,7 +1014,7 @@ class TransactionService extends Service implements ITransactionService {
             {
               [$and]: [
                 where(
-                  col('header.stake_prev_tx_id'),
+                  col('header.stake_prev_transaction_id'),
                   '=',
                   sql`${Buffer.alloc(32)}`
                 ),
@@ -1029,7 +1029,7 @@ class TransactionService extends Service implements ITransactionService {
             {
               [$and]: [
                 where(
-                  col('header.stake_prev_tx_id'),
+                  col('header.stake_prev_transaction_id'),
                   '!=',
                   sql`${Buffer.alloc(32)}`
                 ),

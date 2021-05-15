@@ -30,6 +30,7 @@ import { ITransactionService } from '@/app/service/transaction'
 
 declare module 'egg' {
   export const CHAIN = Symbol('vips.chain')
+  export type APITypes = 'original' | 'insight' | 'blockbook'
   interface Application {
     blockchainInfo: {
       tip: ITip | null
@@ -92,6 +93,9 @@ declare module 'egg' {
     vipsinfo: {
       port: number
       rpc: RpcClientConfig
+    }
+    api: {
+      type: APITypes
     }
     vips: {
       chain: chainType

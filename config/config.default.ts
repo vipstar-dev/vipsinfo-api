@@ -69,5 +69,9 @@ export default (appInfo: EggAppConfig): PowerPartial<EggAppConfig> => {
     },
   }
 
+  config.api = {
+    type: 'original',
+  }
+
   return config
 }

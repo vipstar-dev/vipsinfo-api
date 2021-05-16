@@ -35,7 +35,7 @@
   * [QRC20 Transaction list](doc/contract.md#QRC20-Transaction-list)
 
 ## What's this?
-This is VIPSTARCOIN Explorer API. This software is what rewrited [qtuminfo-api](https://github.com/qtumproject/qtuminfo-api) by TypeScript.
+This is VIPSTARCOIN Explorer API. This software is what rewrote [qtuminfo-api](https://github.com/qtumproject/qtuminfo-api) by TypeScript.
 
 ## API Endpoint
 * Coming Soon...

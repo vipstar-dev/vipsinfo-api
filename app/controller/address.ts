@@ -62,6 +62,9 @@ class AddressController extends Controller implements IAddressController {
       ranking: summary.ranking,
       transactionCount: summary.transactionCount,
       blocksMined: summary.blocksMined,
+      superStaker: summary.superStaker,
+      fee: summary.fee,
+      delegations: summary.delegations,
     }
   }
 

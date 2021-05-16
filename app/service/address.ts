@@ -18,6 +18,10 @@ import EVMReceiptLog from 'vipsinfo/node/models/evm-receipt-log'
 import Transaction from 'vipsinfo/node/models/transaction'
 import TransactionOutput from 'vipsinfo/node/models/transaction-output'
 import { sql } from 'vipsinfo/node/utils'
+import RpcClient, {
+  GetDelegationInfoForAddressResult,
+  GetDelegationsForStakerResult,
+} from 'vipsinfo/rpc'
 
 import { ContractObject } from '@/app/middleware/contract'
 import { TransformedHexAddressObject } from '@/app/service/contract'
@@ -34,6 +38,11 @@ import {
 
 const { in: $in, gt: $gt, or: $or } = Op
 
+export interface Delegator {
+  delegator: string
+  fee: number
+}
+
 export interface AddressSummaryObject {
   balance: bigint
   totalReceived: bigint
@@ -46,6 +55,9 @@ export interface AddressSummaryObject {
   ranking: number | null
   transactionCount: number
   blocksMined: number
+  superStaker?: string
+  fee?: number
+  delegations?: Delegator[]
 }
 
 export interface AddressTransactionsObject {
@@ -168,6 +180,31 @@ class AddressService extends Service implements IAddressService {
     const hexAddresses = rawAddresses
       .filter((address) => address.type === RawAddress.PAY_TO_PUBLIC_KEY_HASH)
       .map((address) => address.data as Buffer)
+    const client = new RpcClient(this.app.config.vipsinfo.rpc)
+    let delegationInfoForAddress: GetDelegationInfoForAddressResult | undefined
+    let delegationsForStaker: GetDelegationsForStakerResult[] | undefined
+    const promiseDelegationInfoForAddress = client.rpcMethods.getdelegationinfoforaddress?.(
+      rawAddresses[0].toString() as string
+    )
+    if (promiseDelegationInfoForAddress) {
+      try {
+        delegationInfoForAddress = await promiseDelegationInfoForAddress
+        if (!delegationInfoForAddress.staker) {
+          delegationInfoForAddress = undefined
+        }
+      } catch (e) {}
+    }
+    const promiseDelegationsForStaker = client.rpcMethods.getdelegationsforstaker?.(
+      rawAddresses[0].toString() as string
+    )
+    if (promiseDelegationsForStaker) {
+      try {
+        delegationsForStaker = await promiseDelegationsForStaker
+        if (delegationsForStaker.length === 0) {
+          delegationsForStaker = undefined
+        }
+      } catch (e) {}
+    }
     const [
       { totalReceived, totalSent },
       unconfirmed,
@@ -204,6 +241,14 @@ class AddressService extends Service implements IAddressService {
       ranking,
       transactionCount,
       blocksMined,
+      superStaker: delegationInfoForAddress?.staker,
+      fee: delegationInfoForAddress?.fee,
+      delegations: delegationsForStaker?.map((delegation) => {
+        return {
+          delegator: delegation.staker,
+          fee: delegation.fee,
+        }
+      }),
     }
   }
 

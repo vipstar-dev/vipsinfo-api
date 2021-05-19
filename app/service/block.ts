@@ -36,7 +36,7 @@ export interface BlockObject
   size: number
   weight: number
   transactions: Buffer[]
-  miner: string
+  miner: string | null
   reward: bigint
   confirmations: number
 }
@@ -134,6 +134,12 @@ class BlockService extends Service implements IBlockService {
             },
           ],
         },
+        {
+          model: Transaction,
+          as: 'transactions',
+          required: true,
+          attributes: ['id'],
+        },
       ],
       transaction: (this.ctx.state as ContextStateBase).transaction,
     })
@@ -177,7 +183,7 @@ class BlockService extends Service implements IBlockService {
       size: result.block.size,
       weight: result.block.weight,
       transactions: result.transactions.map((tx) => tx.id),
-      miner: result.block.miner.string,
+      miner: result.block.miner ? result.block.miner.string : null,
       difficulty: result.difficulty,
       reward,
       confirmations:

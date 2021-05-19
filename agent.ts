@@ -69,6 +69,8 @@ export default function (agent: Application) {
     // @ts-ignore
     agent.messenger.sendRandom('update-feerate')
     // @ts-ignore
+    agent.messenger.sendRandom('update-price')
+    // @ts-ignore
     agent.messenger.sendRandom('update-dgpinfo')
   })
 }

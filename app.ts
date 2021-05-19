@@ -67,6 +67,10 @@ export default (app: Application) => {
     await app.runSchedule('update-feerate')
   })
 
+  app.messenger.on('update-price', async () => {
+    await app.runSchedule('update-price')
+  })
+
   app.messenger.on('update-dgpinfo', async () => {
     const ctx = app.createAnonymousContext()
     const dgpInfo = await ctx.service.info.getDGPInfo()

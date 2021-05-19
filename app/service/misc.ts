@@ -154,6 +154,7 @@ class MiscService extends Service implements IMiscService {
           headers: {
             Accept: 'application/json',
           },
+          dataType: 'json',
         }
       ),
       this.ctx.curl(
@@ -162,6 +163,7 @@ class MiscService extends Service implements IMiscService {
           headers: {
             Accept: 'application/json',
           },
+          dataType: 'json',
         }
       ),
     ])

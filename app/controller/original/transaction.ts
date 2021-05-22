@@ -4,7 +4,7 @@ import { Transaction } from 'vipsinfo/lib'
 
 import { TransactionObject } from '@/app/service/transaction'
 
-export interface ITransactionController {
+export interface IOriginalTransactionController {
   transaction(): Promise<void>
   transactions(): Promise<void>
   rawTransaction(): Promise<void>
@@ -15,7 +15,7 @@ export interface ITransactionController {
 
 class TransactionController
   extends Controller
-  implements ITransactionController {
+  implements IOriginalTransactionController {
   async transaction(): Promise<void> {
     const ctx = this.ctx as CustomContextForTransaction
     ctx.assert(ctx.params.id && /^[0-9a-f]{64}$/i.test(ctx.params.id), 404)

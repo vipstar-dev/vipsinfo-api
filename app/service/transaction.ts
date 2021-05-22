@@ -34,6 +34,8 @@ import RpcClient from 'vipsinfo/rpc'
 
 const { in: $in, or: $or, and: $and, gt: $gt } = Op
 
+const COIN = 1e8
+
 interface TransactionDb
   extends Omit<Transaction, 'header' | 'contractSpendSource'> {
   header: Pick<Header, 'hash' | 'timestamp'>
@@ -56,7 +58,7 @@ interface TransactionOutputDb
     TransactionOutput,
     'inputTransaction' | 'address' | 'refund' | 'refundTo' | 'evmReceipt'
   > {
-  inputTransaction: Pick<Transaction, 'id'>
+  inputTransaction: Pick<Transaction, 'id' | 'blockHeight'>
   address: Pick<Address, 'type' | 'string'> & {
     contract: Pick<Contract, 'address' | 'addressString'>
   }
@@ -124,6 +126,7 @@ export interface TransactionOutputObject
   isInvalidContract?: true
   spentTxId?: Buffer
   spentIndex?: number
+  spentHeight?: number
   refundTxId?: Buffer
   refundIndex?: number
   refundValue?: bigint
@@ -165,12 +168,12 @@ export interface TransformedTransactionObject {
   hash?: string
   version?: number
   lockTime?: number
-  blockHash?: string | null
+  blockHash?: string
   inputs: TransformedTransactionInputObject[]
   outputs: TransformedTransactionOutputObject[]
   isCoinbase: boolean
   isCoinstake: boolean
-  blockHeight: number | undefined
+  blockHeight?: number
   confirmations: number
   timestamp: number | undefined
   inputValue: string
@@ -190,6 +193,7 @@ export interface TransformedTransactionObject {
 }
 
 export interface TransformedTransactionInputObject {
+  index: number
   coinbase?: string
   prevTxId?: string
   outputIndex?: number
@@ -207,6 +211,7 @@ export interface TransformedTransactionInputObject {
 }
 
 export interface TransformedTransactionOutputObject {
+  index: number
   value: string
   address: string
   addressHex: string
@@ -219,6 +224,7 @@ export interface TransformedTransactionOutputObject {
   isRefund?: true
   spentTxId?: string
   spentIndex?: number
+  spentHeight?: number
   receipt?: Pick<EVMReceipt, 'gasUsed' | 'excepted' | 'exceptedMessage'> & {
     sender: string
     contractAddress: string
@@ -261,6 +267,78 @@ export interface Qrc721TransferObject extends Pick<QRC721, 'name' | 'symbol'> {
   to: string
   toHex?: string
   tokenId: string
+}
+
+export interface TransformedInsightTransactionObject {
+  txid: string
+  hash: string
+  version: number
+  locktime: number
+  receipt?: ReceiptInsightObject[]
+  isqrc20Transfer: boolean
+  vin: TransformedInsightTransactionInputObject[]
+  vout: TransformedInsightTransactionOutputObject[]
+  blockhash?: string
+  blockheight?: number
+  confirmations: number
+  time?: number
+  blocktime?: number
+  isCoinbase?: boolean
+  isCoinstake?: boolean
+  valueOut: number
+  size: number
+  valueIn?: number
+  fees?: number
+}
+
+export interface ReceiptInsightObject {
+  blockHash: string
+  blockNumber?: number
+  transactionHash: string
+  transactionIndex: number
+  from: string
+  to: string
+  cumulativeGasUsed: number
+  gasUsed: number
+  contractAddress: string
+  excepted: string
+  log: ReceiptLogInsightObject[]
+}
+
+export interface ReceiptLogInsightObject {
+  address: string
+  topics: string[]
+  data: string
+}
+
+export interface TransformedInsightTransactionInputObject {
+  coinbase?: string
+  txid?: string
+  vout?: number
+  sequence: number
+  n: number
+  scriptSig?: {
+    hex: string
+    asm: string
+  }
+  addr?: string
+  valueSat?: number
+  value?: number
+  doubleSpentTxID?: null
+}
+
+export interface TransformedInsightTransactionOutputObject {
+  value: string
+  n: number
+  scriptPubKey?: {
+    hex: string
+    asm: string
+    addresses: string[]
+    type: string
+  }
+  spentTxId: string | null
+  spentIndex: number | null
+  spentHeight: number | null
 }
 
 interface BasicTransactionDb
@@ -359,6 +437,9 @@ export interface ITransactionService extends Service {
     transaction: TransactionObject,
     object?: BriefOption
   ): Promise<TransformedTransactionObject>
+  transformInsightTransaction(
+    transaction: TransactionObject
+  ): Promise<TransformedInsightTransactionObject>
   transformInput(
     input: TransactionInputObject,
     index: number,
@@ -489,7 +570,7 @@ class TransactionService extends Service implements ITransactionService {
           model: Transaction,
           as: 'inputTransaction',
           required: false,
-          attributes: ['id'],
+          attributes: ['id', 'blockHeight'],
         },
         {
           model: TransactionInput,
@@ -852,6 +933,7 @@ class TransactionService extends Service implements ITransactionService {
         if (output.inputTransaction) {
           outputObject.spentTxId = output.inputTransaction.id
           outputObject.spentIndex = output.inputIndex
+          outputObject.spentHeight = output.inputTransaction.blockHeight
         }
         if (output.refund) {
           outputObject.refundTxId = output.refund.refundToTransaction.id
@@ -1250,6 +1332,135 @@ class TransactionService extends Service implements ITransactionService {
     }
   }
 
+  async transformInsightTransaction(
+    transaction: TransactionObject
+  ): Promise<TransformedInsightTransactionObject> {
+    const transformedTransaction = await this.transformTransaction(transaction)
+    const hasReceiptOutputs = transformedTransaction.outputs.filter(
+      (output) => output.receipt
+    )
+    let valueIn: number | undefined =
+      parseInt(transformedTransaction.inputValue) / COIN
+    let fees: number | undefined = parseInt(transformedTransaction.fees) / COIN
+    if (fees < 0) {
+      valueIn = undefined
+      fees = undefined
+    }
+    return {
+      txid: transformedTransaction.id,
+      hash: transformedTransaction.hash as string,
+      version: transformedTransaction.version as number,
+      locktime: transformedTransaction.lockTime as number,
+      receipt: hasReceiptOutputs.length
+        ? hasReceiptOutputs.map((output) => {
+            const receipt = output.receipt
+            return {
+              blockHash: transformedTransaction.blockHash as string,
+              blockNumber: transformedTransaction.blockHeight,
+              transactionHash: transformedTransaction.hash as string,
+              transactionIndex: output.index,
+              from: RawAddress.fromString(
+                receipt?.sender as string,
+                this.app.chain()
+              )?.data?.toString('hex') as string,
+              to: receipt?.contractAddress as string,
+              cumulativeGasUsed: receipt?.gasUsed as number,
+              gasUsed: receipt?.gasUsed as number,
+              contractAddress: receipt?.contractAddress as string,
+              excepted: receipt?.excepted as string,
+              log: receipt?.logs.map((log) => {
+                return {
+                  address: log.address,
+                  topics: log.topics,
+                  data: log.data,
+                }
+              }) as ReceiptLogInsightObject[],
+            }
+          })
+        : undefined,
+      isqrc20Transfer: !!transformedTransaction.qrc20TokenTransfers,
+      vin: transformedTransaction.inputs.map((input) => {
+        const valueSat = parseInt(input.value as string)
+        const value = valueSat / COIN
+        const result = {
+          sequence: input.sequence,
+          n: input.index,
+        } as TransformedInsightTransactionInputObject
+        if (input.coinbase) {
+          result.coinbase = input.coinbase
+        } else {
+          result.txid = input.prevTxId
+          result.vout = input.outputIndex
+          result.scriptSig = {
+            hex: input.scriptSig.hex as string,
+            asm: input.scriptSig.asm as string,
+          }
+          result.addr = input.address
+          result.valueSat = valueSat
+          result.value = value
+          result.doubleSpentTxID = null
+        }
+        return result
+      }),
+      vout: transformedTransaction.outputs.map((output) => {
+        const value = String(parseInt(output.value) / COIN)
+        let addressStr: string | undefined
+        const address = RawAddress.fromScript(
+          // @ts-ignore
+          OutputScript.fromBuffer(
+            Buffer.from(output.scriptPubKey.hex as string, 'hex')
+          ),
+          this.app.chain(),
+          Buffer.from(transformedTransaction.id, 'hex'),
+          output.index
+        )
+        if (
+          address &&
+          output.receipt &&
+          transformedTransaction.qrc20TokenTransfers
+        ) {
+          for (const tokenTransfers of transformedTransaction.qrc20TokenTransfers) {
+            if (tokenTransfers.address === address.toString()) {
+              addressStr = tokenTransfers.to
+            }
+          }
+        } else if (address) {
+          addressStr = address.toString()
+        }
+        return {
+          value,
+          n: output.index,
+          scriptPubKey: Object.assign(
+            output.scriptPubKey,
+            addressStr
+              ? {
+                  addresses: [addressStr],
+                }
+              : {}
+          ),
+          spentTxId: output.spentTxId || null,
+          spentIndex: output.spentIndex || null,
+          spentHeight: output.spentHeight || null,
+        } as TransformedInsightTransactionOutputObject
+      }),
+      blockhash: transformedTransaction.blockHash,
+      blockheight: transformedTransaction.blockHeight,
+      confirmations: transformedTransaction.confirmations,
+      time: transformedTransaction.timestamp,
+      blocktime: transformedTransaction.timestamp,
+      isCoinbase: transformedTransaction.isCoinbase
+        ? transformedTransaction.isCoinbase
+        : undefined,
+      isCoinstake: transformedTransaction.isCoinstake
+        ? transformedTransaction.isCoinstake
+        : undefined,
+      valueOut: parseInt(transformedTransaction.outputValue) / COIN,
+      size: transformedTransaction.size as number,
+      valueIn,
+      fees,
+    }
+  }
+
   transformInput(
     input: TransactionInputObject,
     index: number,
@@ -1263,7 +1474,9 @@ class TransactionService extends Service implements ITransactionService {
       witness: input.witness,
       isCoinbase: isCoinbase(input),
     })
-    const result: Partial<TransformedTransactionInputObject> = {}
+    const result: Partial<TransformedTransactionInputObject> = {
+      index,
+    }
     if (scriptSig.type === InputScript.COINBASE) {
       result.coinbase = (scriptSig as ICoinbaseScript).buffer?.toString('hex')
     } else {
@@ -1296,6 +1509,7 @@ class TransactionService extends Service implements ITransactionService {
     const scriptPubKey = OutputScript.fromBuffer(output.scriptPubKey)
     const type = scriptPubKey.isEmpty() ? 'empty' : scriptPubKey.type
     const result = {
+      index,
       value: output.value.toString(),
       address: output.addressHex
         ? output.addressHex.toString('hex')
@@ -1312,6 +1526,7 @@ class TransactionService extends Service implements ITransactionService {
     if (output.spentTxId) {
       result.spentTxId = output.spentTxId.toString('hex')
       result.spentIndex = output.spentIndex
+      result.spentHeight = output.spentHeight
     }
     if (!brief && output.evmReceipt) {
       result.receipt = {

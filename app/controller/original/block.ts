@@ -3,7 +3,7 @@ import { Block } from 'vipsinfo/lib'
 
 import { BlockObject } from '@/app/service/block'
 
-export interface IBlockController extends Controller {
+export interface IOriginalBlockController extends Controller {
   block(): Promise<void>
   rawBlock(): Promise<void>
   list(): Promise<void>
@@ -11,7 +11,7 @@ export interface IBlockController extends Controller {
   recent(): Promise<void>
 }
 
-class BlockController extends Controller implements IBlockController {
+class BlockController extends Controller implements IOriginalBlockController {
   async block(): Promise<void> {
     const ctx = this.ctx as CustomContextForBlockFilter
     let arg: Buffer | string | number = ctx.params.block

@@ -202,6 +202,12 @@ class BlockService extends Service implements IBlockService {
     }
     const block = await Header.findOne({
       where: filter,
+      include: [
+        {
+          model: Transaction,
+          as: 'transactions',
+        },
+      ],
       transaction: (this.ctx.state as ContextStateBase).transaction,
     })
     if (!block) {

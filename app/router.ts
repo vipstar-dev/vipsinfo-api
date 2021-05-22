@@ -245,6 +245,7 @@ export default (app: Application) => {
   } else if (apiType === 'insight') {
     router.get('/blocks', controller.insight.block.list)
     router.get('/block/:block', controller.insight.block.block)
+    router.get('/block-index/:block', controller.insight.block.blockIndex)
     router.get('/rawblock/:block', controller.insight.block.rawBlock)
 
     router.get('/tx/:id', controller.insight.transaction.transaction)

@@ -40,15 +40,15 @@ class BlockController extends Controller implements IInsightBlockController {
       confirmations:
         (this.app.blockchainInfo.tip?.height as number) - block.height + 1,
       previousblockhash: block.prevHash.toString('hex'),
-      ...(block.nextHash ? { nextHash: block.nextHash.toString('hex') } : {}),
+      ...(block.nextHash ? { nextblockhash: block.nextHash.toString('hex') } : {}),
       hashStateRoot: block.hashStateRoot.toString('hex'),
       hashUTXORoot: block.hashUTXORoot.toString('hex'),
       prevOutStakeHash: block.stakePrevTxId.toString('hex'),
       prevOutStakeN: block.stakeOutputIndex,
       signature: block.signature.toString('hex'),
       flags: block.proofOfStake ? 'proof-of-stake' : 'proof-of-work',
-      reward: block.reward.toString(),
-      miner: block.miner,
+      reward: Number(block.reward) / 1e8,
+      minedBy: block.miner,
     }
   }
 

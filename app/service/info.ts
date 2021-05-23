@@ -1,7 +1,10 @@
 import { ContextStateBase, Service } from 'egg'
 import { Op } from 'sequelize'
 import Header from 'vipsinfo/node/models/header'
-import RpcClient, { EstimateSmartFeeResult } from 'vipsinfo/rpc'
+import RpcClient, {
+  EstimateSmartFeeResult,
+  GetNetworkInfoResult,
+} from 'vipsinfo/rpc'
 
 const { gte: $gte } = Op
 
@@ -12,6 +15,29 @@ export interface InfoObject {
   netStakeWeight: number
   feeRate: number
   dgpInfo: Partial<DgpInfoObject>
+}
+
+export interface InsightStatusObject {
+  info: {
+    version: number
+    protocolversion: number
+    blocks: number
+    timeoffset: number
+    connections: number
+    proxy: string
+    difficulty: {
+      'proof-of-work': number
+      'proof-of-stake': number
+    }
+    testnet: boolean
+    relayfee: number
+    errors: string
+    network: 'livenet' | 'testnet'
+    reward: {
+      'proof-of-work': number
+      'proof-of-stake': number
+    }
+  }
 }
 
 export interface FeeRateObject {
@@ -25,14 +51,22 @@ export interface DgpInfoObject {
   blockGasLimit: number
 }
 
+export interface DifficultyObject {
+  proofOfWork: number
+  proofOfStake: number
+}
+
 export interface IInfoService extends Service {
   getInfo(): Promise<InfoObject>
+  getInsightStatus(): Promise<InsightStatusObject>
+  getProofOfStakeReward(): number
   getTotalSupply(): Promise<number>
   getTotalMaxSupply(): number
   getCirculatingSupply(): Promise<number>
   getStakeWeight(): Promise<number>
   getFeeRates(): Promise<FeeRateObject[]>
   getDGPInfo(): Promise<DgpInfoObject>
+  getDifficulty(): Promise<DifficultyObject>
 }
 
 class InfoService extends Service implements IInfoService {
@@ -63,6 +97,36 @@ class InfoService extends Service implements IInfoService {
     }
   }
 
+  async getInsightStatus(): Promise<InsightStatusObject> {
+    const client = new RpcClient(this.app.config.vipsinfo.rpc)
+    const info = (await client.rpcMethods.getnetworkinfo?.()) as GetNetworkInfoResult
+    const difficulty = await this.getDifficulty()
+    const testnet = this.app.config.vips.chain in ['testnet', 'regtest']
+    const reward = {
+      'proof-of-work': 100 * 1e8,
+      'proof-of-stake': this.getProofOfStakeReward(),
+    }
+    return {
+      info: {
+        version: info.version,
+        protocolversion: info.protocolversion,
+        blocks: this.app.blockchainInfo.tip?.height as number,
+        timeoffset: info.timeoffset,
+        connections: info.connections,
+        proxy: info.networks[0].proxy,
+        difficulty: {
+          'proof-of-work': difficulty.proofOfWork,
+          'proof-of-stake': difficulty.proofOfStake,
+        },
+        testnet,
+        relayfee: info.relayfee,
+        errors: info.warnings,
+        network: testnet ? 'testnet' : 'livenet',
+        reward,
+      },
+    }
+  }
+
   async getTotalSupply(): Promise<number> {
     const client = new RpcClient(this.app.config.vipsinfo.rpc)
     const info = await client.rpcMethods.getblockchaininfo?.()
@@ -74,6 +138,16 @@ class InfoService extends Service implements IInfoService {
 
   getTotalMaxSupply(): number {
     return 7 * 1e18
+  }
+
+  getProofOfStakeReward(): number {
+    const height = this.app.blockchainInfo.tip?.height as number
+    let subsidy = BigInt(9500 * 1e8)
+    const halvings = Math.round(height / 525600)
+    if (halvings >= 128) return 0
+    subsidy >>= BigInt(halvings)
+    if (subsidy < BigInt(100 * 1e8)) return 100 * 1e8
+    return Number(subsidy)
   }
 
   async getCirculatingSupply(): Promise<number> {
@@ -137,6 +211,29 @@ class InfoService extends Service implements IInfoService {
       maxBlockSize: 0,
       minGasPrice: 0,
       blockGasLimit: 0,
+    }
+  }
+
+  async getDifficulty(): Promise<DifficultyObject> {
+    const height: number = await Header.aggregate('height', 'max', {
+      transaction: (this.ctx.state as ContextStateBase).transaction,
+    })
+    const headers = await Header.findAll({
+      where: { height: { [$gte]: height - 1000 } },
+    })
+    headers.reverse()
+    const getLastBlockIndex = (fProofOfStake: boolean): Header | undefined => {
+      for (const header of headers) {
+        if (header.isProofOfStake === fProofOfStake) {
+          return header
+        }
+      }
+    }
+    const proofOfWork = getLastBlockIndex(false)?.difficulty as number
+    const proofOfStake = getLastBlockIndex(true)?.difficulty as number
+    return {
+      proofOfWork,
+      proofOfStake,
     }
   }
 }

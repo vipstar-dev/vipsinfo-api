@@ -11,7 +11,7 @@ export interface IInsightInfoController extends Controller {
 
 class InfoController extends Controller implements IInsightInfoController {
   async index(): Promise<void> {
-    this.ctx.body = await this.ctx.service.info.getInfo()
+    this.ctx.body = await this.ctx.service.info.getInsightStatus()
   }
 
   async sync(): Promise<void> {

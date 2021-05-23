@@ -7947,10 +7947,10 @@ vary@^1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
 
-vipsinfo@^0.1.6:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/vipsinfo/-/vipsinfo-0.1.6.tgz#ef654b325d8b119909d5cad04aefe3b587e4c379"
-  integrity sha512-b4pEgQDwQ/uNmfa28PfL1E2K9dlNYE3jyyLKS+bAZBlbdZ2DI0iF0jotU6slTErVmAaAGU+tCJmIU5H8DpcK9A==
+vipsinfo@^0.1.8:
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/vipsinfo/-/vipsinfo-0.1.8.tgz#54d4f293dd198be0ef35871b805fe1177278b467"
+  integrity sha512-vaCVhYyArxDMSNUhss3l0+KkzEVhqjmysJfmWdIdGSwgIRkUataHUt5Mxgcw5m0q+nELfqO/WsdQ8k85w3RnRw==
   dependencies:
     colors "^1.3.3"
     commander "^3.0.1"

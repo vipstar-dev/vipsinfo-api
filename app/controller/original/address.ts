@@ -4,7 +4,7 @@ import { Address } from 'vipsinfo/lib'
 import { ContractObject } from '@/app/middleware/contract'
 import { Qrc20BalanceObject } from '@/app/service/qrc20'
 
-export interface IAddressController extends Controller {
+export interface IOriginalAddressController extends Controller {
   summary(): Promise<void>
   balance(): Promise<void>
   totalReceived(): Promise<void>
@@ -23,7 +23,9 @@ export interface IAddressController extends Controller {
   qrc20BalanceHistory(): Promise<void>
 }
 
-class AddressController extends Controller implements IAddressController {
+class AddressController
+  extends Controller
+  implements IOriginalAddressController {
   async summary(): Promise<void> {
     const ctx = this.ctx as CustomContextForAddress
     const { address } = ctx.state

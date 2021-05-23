@@ -13,6 +13,7 @@ export interface IInsightTransactionController {
   transaction(): Promise<void>
   rawTransaction(): Promise<void>
   list(): Promise<void>
+  receipt(): Promise<void>
   send(): Promise<void>
 }
 
@@ -106,6 +107,15 @@ class TransactionController
       pagesTotal,
       txs,
     }
+  }
+
+  async receipt(): Promise<void> {
+    const ctx = this.ctx as CustomContextForTransaction
+    ctx.assert(ctx.params.id && /^[0-9a-f]{64}$/i.test(ctx.params.id), 404)
+    ctx.body =
+      (await ctx.service.transaction.transformInsightReceipt(
+        ctx.params.id as string
+      )) || []
   }
 
   async send(): Promise<void> {

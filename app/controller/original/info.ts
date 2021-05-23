@@ -2,7 +2,7 @@ import { Controller } from 'egg'
 
 import { FeeRateObject } from '@/app/service/info'
 
-export interface IInfoController extends Controller {
+export interface IOriginalInfoController extends Controller {
   index(): Promise<void>
   supply(): Promise<void>
   totalMaxSupply(): Promise<void>
@@ -10,7 +10,7 @@ export interface IInfoController extends Controller {
   feeRates(): Promise<void>
 }
 
-class InfoController extends Controller implements IInfoController {
+class InfoController extends Controller implements IOriginalInfoController {
   async index(): Promise<void> {
     this.ctx.body = await this.ctx.service.info.getInfo()
   }

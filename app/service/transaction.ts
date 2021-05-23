@@ -440,6 +440,9 @@ export interface ITransactionService extends Service {
   transformInsightTransaction(
     transaction: TransactionObject
   ): Promise<TransformedInsightTransactionObject>
+  transformInsightReceipt(
+    id: string
+  ): Promise<ReceiptInsightObject[] | undefined>
   transformInput(
     input: TransactionInputObject,
     index: number,
@@ -1336,12 +1339,13 @@ class TransactionService extends Service implements ITransactionService {
     transaction: TransactionObject
   ): Promise<TransformedInsightTransactionObject> {
     const transformedTransaction = await this.transformTransaction(transaction)
-    const hasReceiptOutputs = transformedTransaction.outputs.filter(
-      (output) => output.receipt
+    const receipt = await this.transformInsightReceipt(
+      transformedTransaction.id
     )
     let valueIn: number | undefined =
       parseInt(transformedTransaction.inputValue) / COIN
-    let fees: number | undefined = parseInt(transformedTransaction.fees) / COIN
+    const valueOut: number = parseInt(transformedTransaction.outputValue) / COIN
+    let fees: number | undefined = (valueIn * COIN - valueOut * COIN) / COIN
     if (fees < 0) {
       valueIn = undefined
       fees = undefined
@@ -1351,33 +1355,7 @@ class TransactionService extends Service implements ITransactionService {
       hash: transformedTransaction.hash as string,
       version: transformedTransaction.version as number,
       locktime: transformedTransaction.lockTime as number,
-      receipt: hasReceiptOutputs.length
-        ? hasReceiptOutputs.map((output) => {
-            const receipt = output.receipt
-            return {
-              blockHash: transformedTransaction.blockHash as string,
-              blockNumber: transformedTransaction.blockHeight,
-              transactionHash: transformedTransaction.hash as string,
-              transactionIndex: output.index,
-              from: RawAddress.fromString(
-                receipt?.sender as string,
-                this.app.chain()
-              )?.data?.toString('hex') as string,
-              to: receipt?.contractAddress as string,
-              cumulativeGasUsed: receipt?.gasUsed as number,
-              gasUsed: receipt?.gasUsed as number,
-              contractAddress: receipt?.contractAddress as string,
-              excepted: receipt?.excepted as string,
-              log: receipt?.logs.map((log) => {
-                return {
-                  address: log.address,
-                  topics: log.topics,
-                  data: log.data,
-                }
-              }) as ReceiptLogInsightObject[],
-            }
-          })
-        : undefined,
+      receipt,
       isqrc20Transfer: !!transformedTransaction.qrc20TokenTransfers,
       vin: transformedTransaction.inputs.map((input) => {
         const valueSat = parseInt(input.value as string)
@@ -1430,14 +1408,12 @@ class TransactionService extends Service implements ITransactionService {
         return {
           value,
           n: output.index,
-          scriptPubKey: Object.assign(
-            output.scriptPubKey,
-            addressStr
-              ? {
-                  addresses: [addressStr],
-                }
-              : {}
-          ),
+          scriptPubKey: {
+            hex: output.scriptPubKey.hex,
+            asm: output.scriptPubKey.asm,
+            addresses: addressStr ? [addressStr] : undefined,
+            type: output.scriptPubKey.type,
+          },
           spentTxId: output.spentTxId || null,
           spentIndex: output.spentIndex || null,
           spentHeight: output.spentHeight || null,
@@ -1454,11 +1430,35 @@ class TransactionService extends Service implements ITransactionService {
       isCoinstake: transformedTransaction.isCoinstake
         ? transformedTransaction.isCoinstake
         : undefined,
-      valueOut: parseInt(transformedTransaction.outputValue) / COIN,
+      valueOut,
       size: transformedTransaction.size as number,
       valueIn,
       fees,
     }
+  }
+
+  async transformInsightReceipt(
+    id: string
+  ): Promise<ReceiptInsightObject[] | undefined> {
+    const client = new RpcClient(this.app.config.vipsinfo.rpc)
+    const receipts = await client.rpcMethods.gettransactionreceipt?.(id)
+    return receipts
+      ? receipts.map((receipt) => {
+          return {
+            blockHash: receipt.blockHash,
+            blockNumber: receipt.blockNumber,
+            transactionHash: receipt.transactionHash,
+            transactionIndex: receipt.transactionIndex,
+            from: receipt.from,
+            to: receipt.to,
+            cumulativeGasUsed: receipt.cumulativeGasUsed,
+            gasUsed: receipt.gasUsed,
+            contractAddress: receipt.contractAddress,
+            excepted: receipt.excepted,
+            log: receipt.log,
+          }
+        })
+      : undefined
   }
 
   transformInput(

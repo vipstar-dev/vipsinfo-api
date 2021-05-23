@@ -250,8 +250,39 @@ export default (app: Application) => {
 
     router.get('/tx/:id', controller.insight.transaction.transaction)
     router.get('/txs', controller.insight.transaction.list)
+    router.get('/txs/:id/receipt', controller.insight.transaction.receipt)
     router.get('/rawtx/:id', controller.insight.transaction.rawTransaction)
     router.post('/tx/send', controller.insight.transaction.send)
+
+    router.get('/addr/:address', controller.insight.address.summary)
+    router.get(
+      '/addr/:address/utxo',
+      controller.insight.address.utxoOfOneAddress
+    )
+    router.get('/addrs/:address/utxo', controller.insight.address.utxo)
+    router.get('/addrs/:address/unspent', controller.insight.address.unspent)
+
+    router.get('/addr/:address/balance', controller.insight.address.balance)
+    router.get(
+      '/addr/:address/totalReceived',
+      controller.insight.address.totalReceived
+    )
+    router.get('/addr/:address/totalSent', controller.insight.address.totalSent)
+    router.get(
+      '/addr/:address/unconfirmedBalance',
+      controller.insight.address.unconfirmedBalance
+    )
+    router.get(
+      '/addrs/:address/txs',
+      addressMiddleware,
+      controller.insight.address.transactions
+    )
+    router.post('/addrs/txs', controller.insight.address.transactions)
+
+    router.get('/status', controller.insight.info.index)
+    router.get('/sync', controller.insight.info.sync)
+    router.get('/peer', controller.insight.info.peer)
+    router.get('/version', controller.insight.info.version)
   }
 
   // @ts-ignore

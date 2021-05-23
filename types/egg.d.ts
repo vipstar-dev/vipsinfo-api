@@ -5,12 +5,14 @@ import { chainType, IAddress, IChain } from 'vipsinfo/lib'
 import { ITip } from 'vipsinfo/node/services/db'
 import { RpcClientConfig } from 'vipsinfo/rpc'
 
+import { IInsightAddressController } from '@/app/controller/insight/address'
 import { IInsightBlockController } from '@/app/controller/insight/block'
+import { IInsightInfoController } from '@/app/controller/insight/info'
 import { IInsightTransactionController } from '@/app/controller/insight/transaction'
-import { IAddressController } from '@/app/controller/original/address'
+import { IOriginalAddressController } from '@/app/controller/original/address'
 import { IOriginalBlockController } from '@/app/controller/original/block'
 import { IContractController } from '@/app/controller/original/contract'
-import { IInfoController } from '@/app/controller/original/info'
+import { IOriginalInfoController } from '@/app/controller/original/info'
 import { IMiscController } from '@/app/controller/original/misc'
 import { IQRC20Controller } from '@/app/controller/original/qrc20'
 import { IQRC721Controller } from '@/app/controller/original/qrc721'
@@ -43,10 +45,10 @@ declare module 'egg' {
 
   interface IController {
     original: {
-      address: IAddressController
+      address: IOriginalAddressController
       block: IOriginalBlockController
       contract: IContractController
-      info: IInfoController
+      info: IOriginalInfoController
       misc: IMiscController
       qrc20: IQRC20Controller
       qrc721: IQRC721Controller
@@ -54,7 +56,9 @@ declare module 'egg' {
       transaction: IOriginalTransactionController
     }
     insight: {
+      address: IInsightAddressController
       block: IInsightBlockController
+      info: IInsightInfoController
       transaction: IInsightTransactionController
     }
   }

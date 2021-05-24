@@ -321,6 +321,7 @@ export interface TransformedInsightTransactionInputObject {
     hex: string
     asm: string
   }
+  txinwitness?: string[]
   addr?: string
   valueSat?: number
   value?: number
@@ -1373,6 +1374,7 @@ class TransactionService extends Service implements ITransactionService {
             hex: input.scriptSig.hex as string,
             asm: input.scriptSig.asm as string,
           }
+          result.txinwitness = input.witness.length ? input.witness : undefined
           result.addr = input.address
           result.valueSat = valueSat
           result.value = value
@@ -1442,7 +1444,7 @@ class TransactionService extends Service implements ITransactionService {
   ): Promise<ReceiptInsightObject[] | undefined> {
     const client = new RpcClient(this.app.config.vipsinfo.rpc)
     const receipts = await client.rpcMethods.gettransactionreceipt?.(id)
-    return receipts
+    return receipts && receipts.length
       ? receipts.map((receipt) => {
           return {
             blockHash: receipt.blockHash,

@@ -1,6 +1,8 @@
-import { Controller } from 'egg'
+import { ContextStateBase, Controller } from 'egg'
 import Tip from 'vipsinfo/node/models/tip'
 import packageJson from 'vipsinfo/package.json'
+import Header from 'vipsinfo/node/models/header'
+import Block from 'vipsinfo/node/models/block'
 
 export interface IInsightInfoController extends Controller {
   index(): Promise<void>
@@ -15,21 +17,16 @@ class InfoController extends Controller implements IInsightInfoController {
   }
 
   async sync(): Promise<void> {
-    const headerTip = await Tip.findOne({
-      where: {
-        service: 'header',
-      },
-      attributes: ['height'],
-    })
-    const blockTip = await Tip.findOne({
-      where: {
-        service: 'block',
-      },
-      attributes: ['height'],
-    })
-    const headerHeight = headerTip ? headerTip.height : 0
-    const blockHeight = blockTip ? blockTip.height : 0
-    this.ctx.body = {
+    const ctx = this.ctx
+    const headerHeight: number =
+      (await Header.aggregate('height', 'max', {
+        transaction: (ctx.state as ContextStateBase).transaction,
+      })) || 0
+    const blockHeight: number =
+      (await Block.aggregate('height', 'max', {
+        transaction: (ctx.state as ContextStateBase).transaction,
+      })) || 0
+    ctx.body = {
       status: headerHeight === blockHeight ? 'finished' : 'syncing',
       blockChainHeight: headerHeight,
       syncPercentage: blockHeight / headerHeight,

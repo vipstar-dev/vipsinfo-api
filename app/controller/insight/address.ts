@@ -8,7 +8,10 @@ import { Address as RawAddress, IAddress } from 'vipsinfo/lib'
 import Address from 'vipsinfo/node/models/address'
 
 import { PaginationObject } from '@/app/middleware/pagination'
-import { TransactionObject, TransformedInsightTransactionObject } from '@/app/service/transaction'
+import {
+  TransactionObject,
+  TransformedInsightTransactionObject,
+} from '@/app/service/transaction'
 
 const { in: $in } = Op
 

@@ -40,7 +40,9 @@ class BlockController extends Controller implements IInsightBlockController {
       confirmations:
         (this.app.blockchainInfo.tip?.height as number) - block.height + 1,
       previousblockhash: block.prevHash.toString('hex'),
-      ...(block.nextHash ? { nextblockhash: block.nextHash.toString('hex') } : {}),
+      ...(block.nextHash
+        ? { nextblockhash: block.nextHash.toString('hex') }
+        : {}),
       hashStateRoot: block.hashStateRoot.toString('hex'),
       hashUTXORoot: block.hashUTXORoot.toString('hex'),
       prevOutStakeHash: block.stakePrevTxId.toString('hex'),

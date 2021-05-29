@@ -1,8 +1,7 @@
 import { ContextStateBase, Controller } from 'egg'
-import Tip from 'vipsinfo/node/models/tip'
-import packageJson from 'vipsinfo/package.json'
-import Header from 'vipsinfo/node/models/header'
 import Block from 'vipsinfo/node/models/block'
+import Header from 'vipsinfo/node/models/header'
+import packageJson from 'vipsinfo/package.json'
 
 export interface IInsightInfoController extends Controller {
   index(): Promise<void>

@@ -283,6 +283,8 @@ export default (app: Application) => {
     router.get('/sync', controller.insight.info.sync)
     router.get('/peer', controller.insight.info.peer)
     router.get('/version', controller.insight.info.version)
+  } else if (apiType === 'blockbook') {
+    router.get('/', controller.blockbook.info.index)
   }
 
   // @ts-ignore

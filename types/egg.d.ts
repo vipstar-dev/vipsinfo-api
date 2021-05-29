@@ -5,6 +5,7 @@ import { chainType, IAddress, IChain } from 'vipsinfo/lib'
 import { ITip } from 'vipsinfo/node/services/db'
 import { RpcClientConfig } from 'vipsinfo/rpc'
 
+import { IBlockbookInfoController } from '@/app/controller/blockbook/info'
 import { IInsightAddressController } from '@/app/controller/insight/address'
 import { IInsightBlockController } from '@/app/controller/insight/block'
 import { IInsightInfoController } from '@/app/controller/insight/info'
@@ -60,6 +61,9 @@ declare module 'egg' {
       block: IInsightBlockController
       info: IInsightInfoController
       transaction: IInsightTransactionController
+    }
+    blockbook: {
+      info: IBlockbookInfoController
     }
   }
 

@@ -1,12 +1,29 @@
 import { ContextStateBase, Service } from 'egg'
-import { Op } from 'sequelize'
+import os from 'os'
+import { Op, QueryTypes } from 'sequelize'
+import simpleGit from 'simple-git'
+import Block from 'vipsinfo/node/models/block'
 import Header from 'vipsinfo/node/models/header'
+import { sql } from 'vipsinfo/node/utils'
+import packageJson from 'vipsinfo/package.json'
 import RpcClient, {
   EstimateSmartFeeResult,
+  GetBlockchainInfoResult,
   GetNetworkInfoResult,
 } from 'vipsinfo/rpc'
 
 const { gte: $gte } = Op
+
+const sg = simpleGit()
+
+let latestCommitHash: string
+void sg
+  .revparse('--short', ['HEAD'])
+  .then((v: string) => (latestCommitHash = v))
+let latestCommitTime: string
+void sg
+  .log(['--date=iso-strict', '-1'])
+  .then((v) => (latestCommitTime = v.latest?.date as string))
 
 export interface InfoObject {
   height: number
@@ -40,6 +57,38 @@ export interface InsightStatusObject {
   }
 }
 
+export interface BlockbookStatusBlockbookObject {
+  coin: string
+  host: string
+  version: string
+  gitCommit: string
+  buildTime: string
+  syncMode: boolean
+  initialSync: boolean
+  isSync: boolean
+  bestHeight: number
+  isSyncMempool: boolean
+  decimals: number
+  dbSize: number
+  about: string
+}
+
+export interface BlockbookStatusBackendObject {
+  chain: string
+  blocks: number
+  headers: number
+  bestBlockHash: string
+  sizeOnDisk: number
+  version: number
+  subversion: string
+  protocolversion: number
+}
+
+export interface BlockbookStatusObject {
+  blockbook: BlockbookStatusBlockbookObject
+  backend: BlockbookStatusBackendObject
+}
+
 export interface FeeRateObject {
   blocks: number
   feeRate: number
@@ -59,6 +108,7 @@ export interface DifficultyObject {
 export interface IInfoService extends Service {
   getInfo(): Promise<InfoObject>
   getInsightStatus(): Promise<InsightStatusObject>
+  getBlockbookStatus(): Promise<BlockbookStatusObject>
   getProofOfStakeReward(): number
   getTotalSupply(): Promise<number>
   getTotalMaxSupply(): number
@@ -123,6 +173,67 @@ class InfoService extends Service implements IInfoService {
         errors: info.warnings,
         network: testnet ? 'testnet' : 'livenet',
         reward,
+      },
+    }
+  }
+
+  async getBlockbookStatus(): Promise<BlockbookStatusObject> {
+    const client = new RpcClient(this.app.config.vipsinfo.rpc)
+    const blockchainInfo = (await client.rpcMethods.getblockchaininfo?.()) as GetBlockchainInfoResult
+    const networkInfo = (await client.rpcMethods.getnetworkinfo?.()) as GetNetworkInfoResult
+    const host = os.hostname()
+    const version = packageJson.version
+    const headerHeight: number =
+      (await Header.aggregate('height', 'max', {
+        transaction: (this.ctx.state as ContextStateBase).transaction,
+      })) || 0
+    const blockHeight: number =
+      (await Block.aggregate('height', 'max', {
+        transaction: (this.ctx.state as ContextStateBase).transaction,
+      })) || 0
+    const db = this.app.model
+    const [{ bytes }]: { bytes: string }[] = await db.query(
+      sql`
+        SELECT sum(data_length+index_length) AS bytes
+        FROM information_schema.tables where table_schema = ${
+          this.config.sequelize.database as string
+        } 
+        GROUP BY table_schema
+    `,
+      {
+        type: QueryTypes.SELECT,
+        transaction: (this.ctx.state as ContextStateBase).transaction,
+      }
+    )
+    return {
+      blockbook: {
+        coin:
+          blockchainInfo.chain === 'main'
+            ? 'VIPSTARCOIN'
+            : 'VIPSTARCOIN Testnet',
+        host,
+        version,
+        gitCommit: String(latestCommitHash),
+        buildTime: latestCommitTime,
+        syncMode: headerHeight === blockHeight,
+        initialSync: headerHeight - 2000 > blockHeight,
+        isSync: headerHeight === blockHeight,
+        bestHeight: this.app.blockchainInfo.tip?.height as number,
+        isSyncMempool: headerHeight === blockHeight,
+        decimals: 8,
+        dbSize: Number(bytes),
+        about:
+          'Blockbook - blockchain indexer for Trezor wallet https://trezor.io/. Do not use for any other purpose.',
+      },
+      backend: {
+        chain: blockchainInfo.chain,
+        blocks: blockchainInfo.blocks,
+        headers: blockchainInfo.headers,
+        bestBlockHash: blockchainInfo.bestblockhash,
+        sizeOnDisk: Number(blockchainInfo.size_on_disk),
+        version: networkInfo.version,
+        subversion: networkInfo.subversion,
+        protocolversion: networkInfo.protocolversion,
       },
     }
   }

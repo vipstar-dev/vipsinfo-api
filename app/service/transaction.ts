@@ -213,8 +213,8 @@ export interface TransformedTransactionInputObject {
 export interface TransformedTransactionOutputObject {
   index: number
   value: string
-  address: string
-  addressHex: string
+  address?: string
+  addressHex?: string
   isInvalidContract: true
   scriptPubKey: {
     type: string

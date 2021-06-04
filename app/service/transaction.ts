@@ -9,6 +9,7 @@ import {
   IMethodABI,
   InputScript,
   IOutputScript,
+  MultisigOutputScript,
   OutputScript,
   qrc20ABIs,
   Transaction as RawTransaction,
@@ -342,6 +343,54 @@ export interface TransformedInsightTransactionOutputObject {
   spentHeight: number | null
 }
 
+export interface TransformedBlockbookTransactionObject {
+  txid: string
+  hash: string
+  vin: TransformedBlockbookTransactionInputObject[]
+  vout: TransformedBlockbookTransactionOutputObject[]
+  blockhash?: string
+  blockheight?: number
+  confirmations: number
+  time?: number
+  blockTime?: number
+  size: number
+  vsize: number
+  weight: number
+  valueOut: number
+  valueIn: number
+  fees: number
+  hex: string
+}
+
+export interface TransformedBlockbookTransactionInputObject {
+  txid: string
+  sequence: number
+  coinbase?: string
+  n: number
+  isAddress: boolean
+  addresses: string[]
+  vout: number
+  scriptSig: {
+    type: string
+    hex: string
+    asm: string
+  }
+  value: number
+}
+
+export interface TransformedBlockbookTransactionOutputObject {
+  value: number
+  n: number
+  scriptPubKey: {
+    asm: string
+    hex: string
+    reqSigs?: number
+    type: string
+    addresses: string[]
+  }
+  spent: boolean
+}
+
 interface BasicTransactionDb
   extends Pick<Transaction, 'id' | 'blockHeight' | 'indexInBlock'> {
   header: Pick<Header, 'hash' | 'timestamp'>
@@ -441,6 +490,9 @@ export interface ITransactionService extends Service {
   transformInsightTransaction(
     transaction: TransactionObject
   ): Promise<TransformedInsightTransactionObject>
+  transformBlockbookTransaction(
+    transaction: TransactionObject
+  ): Promise<TransformedBlockbookTransactionObject>
   transformInsightReceipt(
     id: string
   ): Promise<ReceiptInsightObject[] | undefined>
@@ -1436,6 +1488,92 @@ class TransactionService extends Service implements ITransactionService {
       size: transformedTransaction.size as number,
       valueIn,
       fees,
+    }
+  }
+
+  async transformBlockbookTransaction(
+    transaction: TransactionObject
+  ): Promise<TransformedBlockbookTransactionObject> {
+    const transformedTransaction = await this.transformTransaction(transaction)
+    const valueIn = parseInt(transformedTransaction.inputValue)
+    const valueOut = parseInt(transformedTransaction.outputValue)
+    let fees = valueIn - valueOut
+    if (fees < 0) fees = 0
+    return {
+      txid: transformedTransaction.id,
+      hash: transformedTransaction.hash as string,
+      vin: transformedTransaction.inputs.map((input, index) => {
+        let value = parseInt(input.value as string)
+        if (isNaN(value)) value = 0
+        return {
+          txid: input.prevTxId || '',
+          sequence: input.sequence as number,
+          coinbase: input.coinbase,
+          n: index,
+          isAddress: !!input.address,
+          addresses: input.address ? [input.address] : [],
+          vout: input.outputIndex || 0,
+          scriptSig: {
+            type: input.scriptSig.type,
+            hex: input.scriptSig.hex as string,
+            asm: input.scriptSig.asm as string,
+          },
+          value,
+        }
+      }),
+      vout: transformedTransaction.outputs.map((output, index) => {
+        const scriptPubKeyChunks = OutputScript.fromBuffer(
+          Buffer.from(output.scriptPubKey.hex || '', 'hex')
+        ).chunks
+        const isMultisig = MultisigOutputScript.isValid(scriptPubKeyChunks)
+        const addresses = isMultisig
+          ? scriptPubKeyChunks.slice(1, -2).map(
+              (chunk) =>
+                new RawAddress({
+                  type: RawAddress.PAY_TO_PUBLIC_KEY_HASH,
+                  data: chunk.buffer,
+                  chain: this.app.chain(),
+                }).toString() as string
+            )
+          : output.address
+          ? [output.address]
+          : []
+        let value = parseInt(output.value)
+        if (isNaN(value)) value = 0
+        return {
+          value,
+          n: index,
+          scriptPubKey: {
+            asm: (output.scriptPubKey.asm as string).replace(
+              ' (invalid script)',
+              ''
+            ),
+            hex: output.scriptPubKey.hex as string,
+            reqSigs: isMultisig
+              ? scriptPubKeyChunks[0].code
+              : addresses.length
+              ? 1
+              : undefined,
+            type: output.scriptPubKey.type,
+            addresses,
+          },
+          spent: !!output.spentTxId,
+        }
+      }),
+      blockhash: transformedTransaction.blockHash,
+      blockheight: transformedTransaction.blockHeight,
+      confirmations: transformedTransaction.confirmations,
+      time: transformedTransaction.timestamp,
+      blockTime: transformedTransaction.timestamp,
+      size: transformedTransaction.size as number,
+      vsize: Math.ceil((transformedTransaction.weight as number) / 4),
+      weight: transformedTransaction.weight as number,
+      valueOut,
+      valueIn,
+      fees,
+      hex: (await this.getRawTransaction(transaction.id))
+        ?.toBuffer()
+        .toString('hex') as string,
     }
   }
 

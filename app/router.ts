@@ -285,6 +285,12 @@ export default (app: Application) => {
     router.get('/version', controller.insight.info.version)
   } else if (apiType === 'blockbook') {
     router.get('/', controller.blockbook.info.index)
+    router.get('/block-index/:block', controller.insight.block.blockIndex)
+    router.get('/v1/block-index/:block', controller.insight.block.blockIndex)
+    router.get('/v2/block-index/:block', controller.insight.block.blockIndex)
+    router.get('/block/:block', controller.blockbook.block.blockV1)
+    router.get('/v1/block/:block', controller.blockbook.block.blockV1)
+    router.get('/v2/block/:block', controller.blockbook.block.blockV2)
   }
 
   // @ts-ignore

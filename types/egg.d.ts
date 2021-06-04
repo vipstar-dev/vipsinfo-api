@@ -32,6 +32,7 @@ import { IQRC20Service } from '@/app/service/qrc20'
 import { IQRC721Service } from '@/app/service/qrc721'
 import { IStatisticsService } from '@/app/service/statistics'
 import { ITransactionService } from '@/app/service/transaction'
+import { IBlockbookBlockController } from '@/app/controller/blockbook/block'
 
 declare module 'egg' {
   export const CHAIN = Symbol('vips.chain')
@@ -63,6 +64,7 @@ declare module 'egg' {
       transaction: IInsightTransactionController
     }
     blockbook: {
+      block: IBlockbookBlockController
       info: IBlockbookInfoController
     }
   }

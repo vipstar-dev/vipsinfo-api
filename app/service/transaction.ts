@@ -1464,7 +1464,10 @@ class TransactionService extends Service implements ITransactionService {
           n: output.index,
           scriptPubKey: {
             hex: output.scriptPubKey.hex,
-            asm: output.scriptPubKey.asm,
+            asm: (output.scriptPubKey.asm as string).replace(
+              ' (invalid script)',
+              ''
+            ),
             addresses: addressStr ? [addressStr] : undefined,
             type: output.scriptPubKey.type,
           },

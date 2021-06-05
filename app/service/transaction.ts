@@ -207,7 +207,7 @@ export interface TransformedTransactionInputObject {
     asm?: string
   }
   sequence?: number
-  witness: string[]
+  witness?: string[]
 }
 
 export interface TransformedTransactionOutputObject {
@@ -1425,7 +1425,7 @@ class TransactionService extends Service implements ITransactionService {
             hex: input.scriptSig.hex as string,
             asm: input.scriptSig.asm as string,
           }
-          result.txinwitness = input.witness.length ? input.witness : undefined
+          result.txinwitness = input.witness
           result.addr = input.address
           result.valueSat = valueSat
           result.value = value

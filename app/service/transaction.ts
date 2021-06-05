@@ -345,6 +345,8 @@ export interface TransformedInsightTransactionOutputObject {
 export interface TransformedBlockbookTransactionObject {
   txid: string
   hash: string
+  version: number
+  locktime: number
   vin: TransformedBlockbookTransactionInputObject[]
   vout: TransformedBlockbookTransactionOutputObject[]
   blockhash?: string
@@ -375,6 +377,7 @@ export interface TransformedBlockbookTransactionInputObject {
     asm: string
   }
   value: number
+  txinwitness?: string[]
 }
 
 export interface TransformedBlockbookTransactionOutputObject {
@@ -1504,14 +1507,16 @@ class TransactionService extends Service implements ITransactionService {
     return {
       txid: transformedTransaction.id,
       hash: transformedTransaction.hash as string,
-      vin: transformedTransaction.inputs.map((input, index) => {
+      version: transformedTransaction.version as number,
+      locktime: transformedTransaction.lockTime as number,
+      vin: transformedTransaction.inputs.map((input) => {
         let value = parseInt(input.value as string)
         if (isNaN(value)) value = 0
         return {
           txid: input.prevTxId || '',
           sequence: input.sequence as number,
           coinbase: input.coinbase,
-          n: index,
+          n: input.index,
           isAddress: !!input.address,
           addresses: input.address ? [input.address] : [],
           vout: input.outputIndex || 0,
@@ -1521,9 +1526,10 @@ class TransactionService extends Service implements ITransactionService {
             asm: input.scriptSig.asm as string,
           },
           value,
+          txinwitness: input.witness,
         }
       }),
-      vout: transformedTransaction.outputs.map((output, index) => {
+      vout: transformedTransaction.outputs.map((output) => {
         const scriptPubKeyChunks = OutputScript.fromBuffer(
           Buffer.from(output.scriptPubKey.hex || '', 'hex')
         ).chunks
@@ -1544,7 +1550,7 @@ class TransactionService extends Service implements ITransactionService {
         if (isNaN(value)) value = 0
         return {
           value,
-          n: index,
+          n: output.index,
           scriptPubKey: {
             asm: (output.scriptPubKey.asm as string).replace(
               ' (invalid script)',

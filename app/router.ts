@@ -291,6 +291,21 @@ export default (app: Application) => {
     router.get('/block/:block', controller.blockbook.block.blockV1)
     router.get('/v1/block/:block', controller.blockbook.block.blockV1)
     router.get('/v2/block/:block', controller.blockbook.block.blockV2)
+
+    router.get('/tx/:id', controller.blockbook.transaction.transactionV1)
+    router.get('/v1/tx/:id', controller.blockbook.transaction.transactionV1)
+    router.get('/v2/tx/:id', controller.blockbook.transaction.transactionV2)
+    router.get('/tx-specific/:id', controller.blockbook.transaction.txSpecific)
+    router.get(
+      '/v1/tx-specific/:id',
+      controller.blockbook.transaction.txSpecific
+    )
+    router.get(
+      '/v2/tx-specific/:id',
+      controller.blockbook.transaction.txSpecific
+    )
+    router.get('/sendtx', controller.blockbook.transaction.sendTxByGet)
+    router.post('/sendtx', controller.blockbook.transaction.sendTxByPost)
   }
 
   // @ts-ignore

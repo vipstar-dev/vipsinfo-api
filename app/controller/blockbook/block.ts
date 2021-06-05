@@ -80,11 +80,19 @@ class BlockController extends Controller implements IBlockbookBlockController {
               }
             }
           }),
-          blockhash: transformedTransaction.blockhash,
-          blockheight: transformedTransaction.blockheight,
+          ...(v2
+            ? {
+                blockHash: transformedTransaction.blockhash,
+                blockHeight: transformedTransaction.blockheight,
+                blockTime: transformedTransaction.blockTime,
+              }
+            : {
+                blockhash: transformedTransaction.blockhash,
+                blockheight: transformedTransaction.blockheight,
+                blocktime: transformedTransaction.blockTime,
+              }),
           confirmations: transformedTransaction.confirmations,
           time: !v2 ? transformedTransaction.time : undefined,
-          blockTime: transformedTransaction.blockTime,
           valueOut: !v2
             ? (transformedTransaction.valueOut / 1e8).toString()
             : undefined,

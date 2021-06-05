@@ -304,8 +304,12 @@ export default (app: Application) => {
       '/v2/tx-specific/:id',
       controller.blockbook.transaction.txSpecific
     )
-    router.get('/sendtx', controller.blockbook.transaction.sendTxByGet)
+    router.get('/sendtx/:id', controller.blockbook.transaction.sendTxByGet)
     router.post('/sendtx', controller.blockbook.transaction.sendTxByPost)
+    router.get('/v1/sendtx/:id', controller.blockbook.transaction.sendTxByGet)
+    router.post('/v1/sendtx', controller.blockbook.transaction.sendTxByPost)
+    router.get('/v2/sendtx/:id', controller.blockbook.transaction.sendTxByGet)
+    router.post('/v2/sendtx', controller.blockbook.transaction.sendTxByPost)
   }
 
   // @ts-ignore

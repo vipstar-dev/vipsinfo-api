@@ -8,7 +8,6 @@ import {
   IEVMContractCallScript,
   IMethodABI,
   InputScript,
-  IOutputScript,
   MultisigOutputScript,
   OutputScript,
   qrc20ABIs,

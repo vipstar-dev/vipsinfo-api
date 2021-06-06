@@ -54,6 +54,7 @@ export interface AddressSummaryObject {
   qrc721Balances: AllQRC721Balances[]
   ranking: number | null
   transactionCount: number
+  unconfirmedTransactionCount: number
   blocksMined: number
   superStaker?: string
   fee?: number
@@ -131,6 +132,7 @@ export interface IAddressService extends Service {
     p2pkhAddressIds: bigint[],
     rawAddresses: IAddress[]
   ): Promise<AddressSummaryObject>
+  getAddressUnconfirmedTransactionCount(addressIds: bigint[]): Promise<number>
   getAddressTransactionCount(
     addressIds: bigint[],
     rawAddresses: IAddress[]
@@ -215,6 +217,7 @@ class AddressService extends Service implements IAddressService {
       ranking,
       blocksMined,
       transactionCount,
+      unconfirmedTransactionCount,
     ] = await Promise.all([
       balanceService.getTotalBalanceChanges(addressIds),
       balanceService.getUnconfirmedBalance(addressIds),
@@ -228,6 +231,7 @@ class AddressService extends Service implements IAddressService {
         transaction: (this.ctx.state as ContextStateBase).transaction,
       }),
       this.getAddressTransactionCount(addressIds, rawAddresses),
+      this.getAddressUnconfirmedTransactionCount(addressIds),
     ])
     return {
       balance: totalReceived - totalSent,
@@ -240,6 +244,7 @@ class AddressService extends Service implements IAddressService {
       qrc721Balances,
       ranking,
       transactionCount,
+      unconfirmedTransactionCount,
       blocksMined,
       superStaker: delegationInfoForAddress?.staker,
       fee: delegationInfoForAddress?.fee,
@@ -250,6 +255,19 @@ class AddressService extends Service implements IAddressService {
         }
       }),
     }
+  }
+
+  async getAddressUnconfirmedTransactionCount(
+    addressIds: bigint[]
+  ): Promise<number> {
+    return await TransactionOutput.count({
+      where: {
+        addressId: { [$in]: addressIds },
+        blockHeight: 0xffffffff,
+        inputHeight: null,
+      },
+      transaction: (this.ctx.state as ContextStateBase).transaction,
+    })
   }
 
   async getAddressTransactionCount(

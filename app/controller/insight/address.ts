@@ -55,7 +55,7 @@ class AddressController
       totalSentSat,
       unconfirmedBalance: unconfirmedBalanceSat / 1e8,
       unconfirmedBalanceSat,
-      unconfirmedTxApperances: 0,
+      unconfirmedTxApperances: summary.unconfirmedTransactionCount,
       txApperances: summary.transactionCount,
       transactions: transactions.map((tx) => tx.toString('hex')),
     }

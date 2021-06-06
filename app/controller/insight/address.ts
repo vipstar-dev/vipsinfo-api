@@ -65,7 +65,22 @@ class AddressController
 
   async summary(): Promise<void> {
     await this.oneAddressMiddleware()
-    const ctx = this.ctx as CustomContextForAddress
+    const ctx = this.ctx as CustomContextForAddress & CustomContextForPagination
+    const paginationObject: Omit<PaginationObject, 'from' | 'to'> = {
+      GET: ctx.query as Omit<PaginationObject, 'from' | 'to'>,
+      POST: ctx.request.body as Omit<PaginationObject, 'from' | 'to'>,
+    }[ctx.method as 'GET' | 'POST']
+    let offset: number, limit: number | undefined
+    if (paginationObject.from && paginationObject.to) {
+      offset = parseInt(paginationObject.from) || 0
+      limit = parseInt(paginationObject.to) - offset || 1000
+      if (offset < 0) offset = 0
+      if (limit < 0) limit = 1000
+    } else {
+      offset = 0
+      limit = 1000
+    }
+    ctx.state.pagination = { limit, offset, reversed: undefined }
     const { address } = ctx.state
     const summary = await ctx.service.address.getAddressSummary(
       address.addressIds,
@@ -76,12 +91,14 @@ class AddressController
       address.addressIds,
       address.rawAddresses
     )
+    const balanceSat = Number(summary.balance)
     const totalReceivedSat = Number(summary.totalReceived)
     const totalSentSat = Number(summary.totalSent)
     const unconfirmedBalanceSat = Number(summary.unconfirmed)
     ctx.body = {
       addrStr: address.rawAddresses[0].toString(),
-      balance: Number(summary.balance) / 1e8,
+      balance: balanceSat / 1e8,
+      balanceSat,
       totalReceived: totalReceivedSat / 1e8,
       totalReceivedSat,
       totalSent: totalSentSat / 1e8,
@@ -90,7 +107,7 @@ class AddressController
       unconfirmedBalanceSat,
       unconfirmedTxApperances: 0,
       txApperances: summary.transactionCount,
-      transactions,
+      transactions: transactions.map((tx) => tx.toString('hex')),
     }
   }
 

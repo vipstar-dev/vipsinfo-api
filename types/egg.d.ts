@@ -107,7 +107,7 @@ declare module 'egg' {
       pagination(
         object?: PaginationConstructor
       ): (
-        ctx: CustomContextForAddress,
+        ctx: CustomContextForPagination,
         next: CallableFunction
       ) => Promise<void>
     }

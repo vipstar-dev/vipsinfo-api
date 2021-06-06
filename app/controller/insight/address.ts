@@ -7,7 +7,6 @@ import { Op, Transaction as SequelizeTransaction } from 'sequelize'
 import { Address as RawAddress, IAddress } from 'vipsinfo/lib'
 import Address from 'vipsinfo/node/models/address'
 
-import { PaginationObject } from '@/app/middleware/original/pagination'
 import {
   TransactionObject,
   TransformedInsightTransactionObject,
@@ -16,71 +15,22 @@ import {
 const { in: $in } = Op
 
 export interface IInsightAddressController extends Controller {
-  oneAddressMiddleware(): Promise<void>
   summary(): Promise<void>
   balance(): Promise<void>
   totalReceived(): Promise<void>
   totalSent(): Promise<void>
   unconfirmedBalance(): Promise<void>
   transactions(): Promise<void>
+  postTransactions(): Promise<void>
   utxo(): Promise<void>
-  utxoOfOneAddress(): Promise<void>
   unspent(): Promise<void>
 }
 
 class AddressController
   extends Controller
   implements IInsightAddressController {
-  async oneAddressMiddleware(): Promise<void> {
-    const ctx = this.ctx as CustomContextForAddress
-    const addressStr = ctx.params.address
-    ctx.assert(addressStr, 400)
-    const rawAddresses: IAddress[] = []
-    try {
-      const chain = ctx.app.chain()
-      const rawAddress = RawAddress.fromString(addressStr, chain) as IAddress
-      if (!rawAddress) throw null
-      rawAddresses.push(rawAddress)
-    } catch (err) {
-      ctx.throw('Not Found', 404)
-      return
-    }
-    const result = await Address.findAll({
-      where: { string: addressStr },
-      attributes: ['_id'],
-      transaction: ctx.state.transaction as SequelizeTransaction,
-    })
-    if (!result) {
-      ctx.throw('Not Found', 404)
-      return
-    }
-    ctx.state.address = {
-      rawAddresses,
-      addressIds: result.map((address) => address._id),
-      p2pkhAddressIds: result
-        .filter((address) => address.type === RawAddress.PAY_TO_PUBLIC_KEY_HASH)
-        .map((address) => address._id),
-    }
-  }
-
   async summary(): Promise<void> {
-    await this.oneAddressMiddleware()
-    const ctx = this.ctx as CustomContextForAddress & CustomContextForPagination
-    const paginationObject: Omit<PaginationObject, 'from' | 'to'> = {
-      GET: ctx.query as Omit<PaginationObject, 'from' | 'to'>,
-      POST: ctx.request.body as Omit<PaginationObject, 'from' | 'to'>,
-    }[ctx.method as 'GET' | 'POST']
-    let offset: number, limit: number
-    if (paginationObject.from && paginationObject.to) {
-      offset = parseInt(paginationObject.from) || 0
-      limit = parseInt(paginationObject.to) - offset || 1000
-      if (offset < 0) offset = 0
-      if (limit < 0) limit = 1000
-    } else {
-      offset = 0
-      limit = 1000
-    }
-    ctx.state.pagination = { limit, offset, reversed: undefined }
+    const ctx = this.ctx as CustomContextForAddress
     const { address } = ctx.state
     const summary = await ctx.service.address.getAddressSummary(
       address.addressIds,
@@ -112,7 +62,6 @@ class AddressController
   }
 
   async balance(): Promise<void> {
-    await this.oneAddressMiddleware()
     const ctx = this.ctx as CustomContextForAddress
     const balance = await ctx.service.balance.getBalance(
       ctx.state.address.addressIds
@@ -121,7 +70,6 @@ class AddressController
   }
 
   async totalReceived(): Promise<void> {
-    await this.oneAddressMiddleware()
     const ctx = this.ctx as CustomContextForAddress
     const { totalReceived } = await ctx.service.balance.getTotalBalanceChanges(
       ctx.state.address.addressIds
@@ -130,7 +78,6 @@ class AddressController
   }
 
   async totalSent(): Promise<void> {
-    await this.oneAddressMiddleware()
     const ctx = this.ctx as CustomContextForAddress
     const { totalSent } = await ctx.service.balance.getTotalBalanceChanges(
       ctx.state.address.addressIds
@@ -139,7 +86,6 @@ class AddressController
   }
 
   async unconfirmedBalance(): Promise<void> {
-    await this.oneAddressMiddleware()
     const ctx = this.ctx as CustomContextForAddress
     const unconfirmed = await ctx.service.balance.getUnconfirmedBalance(
       ctx.state.address.addressIds
@@ -149,15 +95,6 @@ class AddressController
 
   async transactions(): Promise<void> {
     const ctx = this.ctx as CustomContextForAddress & CustomContextForPagination
-    const paginationObject: Omit<PaginationObject, 'from' | 'to'> = {
-      GET: ctx.query as Omit<PaginationObject, 'from' | 'to'>,
-      POST: ctx.request.body as Omit<PaginationObject, 'from' | 'to'>,
-    }[ctx.method as 'GET' | 'POST']
-    let offset = parseInt(paginationObject.from as string) || 0
-    if (offset < 0) offset = 0
-    let limit = parseInt(paginationObject.to as string) - offset || 10
-    if (limit < 0) limit = 10
-    ctx.state.pagination = { limit, offset, reversed: undefined }
     const { address } = ctx.state
     const {
       totalCount,
@@ -175,8 +112,8 @@ class AddressController
     }
     ctx.body = {
       totalItems: totalCount,
-      from: offset,
-      to: limit + offset,
+      from: ctx.state.pagination.offset,
+      to: ctx.state.pagination.limit + ctx.state.pagination.offset,
       items,
     }
   }
@@ -232,11 +169,6 @@ class AddressController
         confirmations: utxo.confirmations,
       }
     })
-  }
-
-  async utxoOfOneAddress(): Promise<void> {
-    await this.oneAddressMiddleware()
-    await this.utxo()
   }
 
   async unspent(): Promise<void> {

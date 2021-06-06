@@ -99,6 +99,18 @@ declare module 'egg' {
         next: CallableFunction
       ) => Promise<void>
     }
+    insight: {
+      address(): (
+        ctx: CustomContextForAddress,
+        next: CallableFunction
+      ) => Promise<void>
+      pagination(
+        object?: PaginationConstructor
+      ): (
+        ctx: CustomContextForAddress,
+        next: CallableFunction
+      ) => Promise<void>
+    }
   }
 
   interface IService {

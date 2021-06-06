@@ -8,6 +8,9 @@ export default (app: Application) => {
   const originalBlockFilterMiddleware = middleware.original.blockFilter()
   const originalContractMiddleware = middleware.original.contract()
   const originalPaginationMiddleware = middleware.original.pagination()
+  const insightAddressMiddleware = middleware.insight.address()
+  const insightPaginationMiddleware = (defaultPageSize: number = 1000) =>
+    middleware.insight.pagination({ defaultPageSize })
 
   if (apiType === 'original') {
     router.get('/info', controller.original.info.index)
@@ -262,30 +265,59 @@ export default (app: Application) => {
     router.get('/rawtx/:id', controller.insight.transaction.rawTransaction)
     router.post('/tx/send', controller.insight.transaction.send)
 
-    router.get('/addr/:address', controller.insight.address.summary)
+    router.get(
+      '/addr/:address',
+      insightAddressMiddleware,
+      insightPaginationMiddleware(),
+      controller.insight.address.summary
+    )
     router.get(
       '/addr/:address/utxo',
-      controller.insight.address.utxoOfOneAddress
+      insightAddressMiddleware,
+      controller.insight.address.utxo
     )
-    router.get('/addrs/:address/utxo', controller.insight.address.utxo)
-    router.get('/addrs/:address/unspent', controller.insight.address.unspent)
+    router.get(
+      '/addrs/:address/utxo',
+      originalAddressMiddleware,
+      controller.insight.address.utxo
+    )
+    router.get(
+      '/addrs/:address/unspent',
+      originalAddressMiddleware,
+      controller.insight.address.unspent
+    )
 
-    router.get('/addr/:address/balance', controller.insight.address.balance)
+    router.get(
+      '/addr/:address/balance',
+      insightAddressMiddleware,
+      controller.insight.address.balance
+    )
     router.get(
       '/addr/:address/totalReceived',
+      insightAddressMiddleware,
       controller.insight.address.totalReceived
     )
-    router.get('/addr/:address/totalSent', controller.insight.address.totalSent)
+    router.get(
+      '/addr/:address/totalSent',
+      insightAddressMiddleware,
+      controller.insight.address.totalSent
+    )
     router.get(
       '/addr/:address/unconfirmedBalance',
+      insightAddressMiddleware,
       controller.insight.address.unconfirmedBalance
     )
     router.get(
       '/addrs/:address/txs',
       originalAddressMiddleware,
+      insightPaginationMiddleware(10),
       controller.insight.address.transactions
     )
-    router.post('/addrs/txs', controller.insight.address.transactions)
+    router.post(
+      '/addrs/txs',
+      insightPaginationMiddleware(10),
+      controller.insight.address.postTransactions
+    )
 
     router.get('/status', controller.insight.info.index)
     router.get('/sync', controller.insight.info.sync)

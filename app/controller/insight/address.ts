@@ -70,7 +70,7 @@ class AddressController
       GET: ctx.query as Omit<PaginationObject, 'from' | 'to'>,
       POST: ctx.request.body as Omit<PaginationObject, 'from' | 'to'>,
     }[ctx.method as 'GET' | 'POST']
-    let offset: number, limit: number | undefined
+    let offset: number, limit: number
     if (paginationObject.from && paginationObject.to) {
       offset = parseInt(paginationObject.from) || 0
       limit = parseInt(paginationObject.to) - offset || 1000

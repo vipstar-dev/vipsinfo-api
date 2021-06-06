@@ -4,10 +4,10 @@ import { Application } from 'egg'
 export default (app: Application) => {
   const { router, controller, io, middleware, config } = app
   const apiType = config.api.type
-  const addressMiddleware = middleware.address()
-  const blockFilterMiddleware = middleware.blockFilter()
-  const contractMiddleware = middleware.contract()
-  const paginationMiddleware = middleware.pagination()
+  const originalAddressMiddleware = middleware.original.address()
+  const originalBlockFilterMiddleware = middleware.original.blockFilter()
+  const originalContractMiddleware = middleware.original.contract()
+  const originalPaginationMiddleware = middleware.original.pagination()
 
   if (apiType === 'original') {
     router.get('/info', controller.original.info.index)
@@ -22,7 +22,7 @@ export default (app: Application) => {
     router.get('/blocks', controller.original.block.list)
     router.get(
       '/block/list',
-      paginationMiddleware,
+      originalPaginationMiddleware,
       controller.original.block.blockList
     )
     router.get('/block/:block', controller.original.block.block)
@@ -31,7 +31,7 @@ export default (app: Application) => {
 
     router.get(
       '/tx/list',
-      paginationMiddleware,
+      originalPaginationMiddleware,
       controller.original.transaction.list
     )
     router.get('/tx/:id', controller.original.transaction.transaction)
@@ -42,190 +42,198 @@ export default (app: Application) => {
 
     router.get(
       '/address/:address',
-      addressMiddleware,
+      originalAddressMiddleware,
       controller.original.address.summary
     )
     router.get(
       '/address/:address/balance',
-      addressMiddleware,
+      originalAddressMiddleware,
       controller.original.address.balance
     )
     router.get(
       '/address/:address/balance/total-received',
-      addressMiddleware,
+      originalAddressMiddleware,
       controller.original.address.totalReceived
     )
     router.get(
       '/address/:address/balance/total-sent',
-      addressMiddleware,
+      originalAddressMiddleware,
       controller.original.address.totalSent
     )
     router.get(
       '/address/:address/balance/unconfirmed',
-      addressMiddleware,
+      originalAddressMiddleware,
       controller.original.address.unconfirmedBalance
     )
     router.get(
       '/address/:address/balance/staking',
-      addressMiddleware,
+      originalAddressMiddleware,
       controller.original.address.stakingBalance
     )
     router.get(
       '/address/:address/balance/mature',
-      addressMiddleware,
+      originalAddressMiddleware,
       controller.original.address.matureBalance
     )
     router.get(
       '/address/:address/qrc20-balance/:token',
-      addressMiddleware,
-      middleware.contract('token'),
+      originalAddressMiddleware,
+      middleware.original.contract('token'),
       controller.original.address.qrc20TokenBalance
     )
     router.get(
       '/address/:address/txs',
-      addressMiddleware,
-      paginationMiddleware,
-      blockFilterMiddleware,
+      originalAddressMiddleware,
+      originalPaginationMiddleware,
+      originalBlockFilterMiddleware,
       controller.original.address.transactions
     )
     router.get(
       '/address/:address/basic-txs',
-      addressMiddleware,
-      paginationMiddleware,
-      blockFilterMiddleware,
+      originalAddressMiddleware,
+      originalPaginationMiddleware,
+      originalBlockFilterMiddleware,
       controller.original.address.basicTransactions
     )
     router.get(
       '/address/:address/contract-txs',
-      addressMiddleware,
-      paginationMiddleware,
-      blockFilterMiddleware,
+      originalAddressMiddleware,
+      originalPaginationMiddleware,
+      originalBlockFilterMiddleware,
       controller.original.address.contractTransactions
     )
     router.get(
       '/address/:address/contract-txs/:contract',
-      addressMiddleware,
-      contractMiddleware,
-      paginationMiddleware,
+      originalAddressMiddleware,
+      originalContractMiddleware,
+      originalPaginationMiddleware,
       controller.original.address.contractTransactions
     )
     router.get(
       '/address/:address/qrc20-txs/:token',
-      addressMiddleware,
-      middleware.contract('token'),
-      paginationMiddleware,
+      originalAddressMiddleware,
+      middleware.original.contract('token'),
+      originalPaginationMiddleware,
       controller.original.address.qrc20TokenTransactions
     )
     router.get(
       '/address/:address/qrc20-mempool-txs/:token',
-      addressMiddleware,
-      middleware.contract('token'),
+      originalAddressMiddleware,
+      middleware.original.contract('token'),
       controller.original.address.qrc20TokenMempoolTransactions
     )
     router.get(
       '/address/:address/utxo',
-      addressMiddleware,
+      originalAddressMiddleware,
       controller.original.address.utxo
     )
     router.get(
       '/address/:address/balance-history',
-      addressMiddleware,
-      paginationMiddleware,
+      originalAddressMiddleware,
+      originalPaginationMiddleware,
       controller.original.address.balanceHistory
     )
     router.get(
       '/address/:address/qrc20-balance-history',
-      addressMiddleware,
-      paginationMiddleware,
+      originalAddressMiddleware,
+      originalPaginationMiddleware,
       controller.original.address.qrc20BalanceHistory
     )
     router.get(
       '/address/:address/qrc20-balance-history/:token',
-      addressMiddleware,
-      middleware.contract('token'),
-      paginationMiddleware,
+      originalAddressMiddleware,
+      middleware.original.contract('token'),
+      originalPaginationMiddleware,
       controller.original.address.qrc20BalanceHistory
     )
 
     router.get(
       '/contract/:contract',
-      contractMiddleware,
+      originalContractMiddleware,
       controller.original.contract.summary
     )
     router.get(
       '/contract/:contract/txs',
-      contractMiddleware,
-      paginationMiddleware,
-      blockFilterMiddleware,
+      originalContractMiddleware,
+      originalPaginationMiddleware,
+      originalBlockFilterMiddleware,
       controller.original.contract.transactions
     )
     router.get(
       '/contract/:contract/basic-txs',
-      contractMiddleware,
-      paginationMiddleware,
-      blockFilterMiddleware,
+      originalContractMiddleware,
+      originalPaginationMiddleware,
+      originalBlockFilterMiddleware,
       controller.original.contract.basicTransactions
     )
     router.get(
       '/contract/:contract/balance-history',
-      contractMiddleware,
-      paginationMiddleware,
+      originalContractMiddleware,
+      originalPaginationMiddleware,
       controller.original.contract.balanceHistory
     )
     router.get(
       '/contract/:contract/qrc20-balance-history',
-      contractMiddleware,
-      paginationMiddleware,
+      originalContractMiddleware,
+      originalPaginationMiddleware,
       controller.original.contract.qrc20BalanceHistory
     )
     router.get(
       '/contract/:contract/qrc20-balance-history/:token',
-      contractMiddleware,
-      middleware.contract('token'),
-      paginationMiddleware,
+      originalContractMiddleware,
+      middleware.original.contract('token'),
+      originalPaginationMiddleware,
       controller.original.contract.qrc20BalanceHistory
     )
     router.get(
       '/contract/:contract/call',
-      contractMiddleware,
+      originalContractMiddleware,
       controller.original.contract.callContract
     )
     router.get(
       '/searchlogs',
-      paginationMiddleware,
-      blockFilterMiddleware,
+      originalPaginationMiddleware,
+      originalBlockFilterMiddleware,
       controller.original.contract.searchLogs
     )
-    router.get('/qrc20', paginationMiddleware, controller.original.qrc20.list)
+    router.get(
+      '/qrc20',
+      originalPaginationMiddleware,
+      controller.original.qrc20.list
+    )
     router.get(
       '/qrc20/txs',
-      paginationMiddleware,
+      originalPaginationMiddleware,
       controller.original.qrc20.allTransactions
     )
     router.get(
       '/qrc20/:token/txs',
-      middleware.contract('token'),
-      paginationMiddleware,
-      blockFilterMiddleware,
+      middleware.original.contract('token'),
+      originalPaginationMiddleware,
+      originalBlockFilterMiddleware,
       controller.original.qrc20.transactions
     )
     router.get(
       '/qrc20/:token/rich-list',
-      middleware.contract('token'),
-      paginationMiddleware,
+      middleware.original.contract('token'),
+      originalPaginationMiddleware,
       controller.original.qrc20.richList
     )
-    router.get('/qrc721', paginationMiddleware, controller.original.qrc721.list)
+    router.get(
+      '/qrc721',
+      originalPaginationMiddleware,
+      controller.original.qrc721.list
+    )
 
     router.get(`/search`, controller.original.misc.classify)
     router.get(
       '/misc/rich-list',
-      paginationMiddleware,
+      originalPaginationMiddleware,
       controller.original.misc.richList
     )
     router.get(
       '/misc/biggest-miners',
-      paginationMiddleware,
+      originalPaginationMiddleware,
       controller.original.misc.biggestMiners
     )
     router.get('/misc/prices', controller.original.misc.prices)
@@ -274,7 +282,7 @@ export default (app: Application) => {
     )
     router.get(
       '/addrs/:address/txs',
-      addressMiddleware,
+      originalAddressMiddleware,
       controller.insight.address.transactions
     )
     router.post('/addrs/txs', controller.insight.address.transactions)

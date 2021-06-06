@@ -23,7 +23,7 @@ import RpcClient, {
   GetDelegationsForStakerResult,
 } from 'vipsinfo/rpc'
 
-import { ContractObject } from '@/app/middleware/contract'
+import { ContractObject } from '@/app/middleware/original/contract'
 import { TransformedHexAddressObject } from '@/app/service/contract'
 import {
   Qrc20Data,

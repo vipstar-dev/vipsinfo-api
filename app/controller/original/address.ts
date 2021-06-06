@@ -1,7 +1,7 @@
 import { Controller, CustomContextForAddress } from 'egg'
 import { Address } from 'vipsinfo/lib'
 
-import { ContractObject } from '@/app/middleware/contract'
+import { ContractObject } from '@/app/middleware/original/contract'
 import { Qrc20BalanceObject } from '@/app/service/qrc20'
 
 export interface IOriginalAddressController extends Controller {

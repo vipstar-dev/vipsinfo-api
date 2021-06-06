@@ -7,7 +7,7 @@ import { Op, Transaction as SequelizeTransaction } from 'sequelize'
 import { Address as RawAddress, IAddress } from 'vipsinfo/lib'
 import Address from 'vipsinfo/node/models/address'
 
-import { PaginationObject } from '@/app/middleware/pagination'
+import { PaginationObject } from '@/app/middleware/original/pagination'
 import {
   TransactionObject,
   TransformedInsightTransactionObject,

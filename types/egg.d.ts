@@ -19,9 +19,9 @@ import { IQRC20Controller } from '@/app/controller/original/qrc20'
 import { IQRC721Controller } from '@/app/controller/original/qrc721'
 import { IStatisticsController } from '@/app/controller/original/statistics'
 import { IOriginalTransactionController } from '@/app/controller/original/transaction'
-import { ContractObject } from '@/app/middleware/contract'
-import { PaginationConstructor } from '@/app/middleware/pagination'
-import { CustomMiddlewareOptions } from '@/app/middleware/ratelimit'
+import { ContractObject } from '@/app/middleware/original/contract'
+import { PaginationConstructor } from '@/app/middleware/original/pagination'
+import { CustomMiddlewareOptions } from '@/app/middleware/original/ratelimit'
 import { IAddressService } from '@/app/service/address'
 import { IBalanceService } from '@/app/service/balance'
 import { IBlockService } from '@/app/service/block'
@@ -72,28 +72,30 @@ declare module 'egg' {
   }
 
   interface IMiddleware {
-    address(): (
-      ctx: CustomContextForAddress,
-      next: CallableFunction
-    ) => Promise<void>
-    blockFilter(): (
-      ctx: CustomContextForBlockFilter,
-      next: CallableFunction
-    ) => Promise<void>
-    contract(
-      paramName?: string
-    ): (ctx: CustomContextForContract, next: CallableFunction) => Promise<void>
-    pagination(
-      object?: PaginationConstructor
-    ): (
-      ctx: CustomContextForPagination,
-      next: CallableFunction
-    ) => Promise<void>
-    ratelimit(options: CustomMiddlewareOptions, app: Application): Middleware
-    transaction(): (
-      ctx: CustomContextBase,
-      next: CallableFunction
-    ) => Promise<void>
+    original: {
+      address(): (
+        ctx: CustomContextForAddress,
+        next: CallableFunction
+      ) => Promise<void>
+      blockFilter(): (
+        ctx: CustomContextForBlockFilter,
+        next: CallableFunction
+      ) => Promise<void>
+      contract(
+        paramName?: string
+      ): (ctx: CustomContextForContract, next: CallableFunction) => Promise<void>
+      pagination(
+        object?: PaginationConstructor
+      ): (
+        ctx: CustomContextForPagination,
+        next: CallableFunction
+      ) => Promise<void>
+      ratelimit(options: CustomMiddlewareOptions, app: Application): Middleware
+      transaction(): (
+        ctx: CustomContextBase,
+        next: CallableFunction
+      ) => Promise<void>
+    }
   }
 
   interface IService {

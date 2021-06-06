@@ -5,7 +5,9 @@ import { chainType, IAddress, IChain } from 'vipsinfo/lib'
 import { ITip } from 'vipsinfo/node/services/db'
 import { RpcClientConfig } from 'vipsinfo/rpc'
 
+import { IBlockbookBlockController } from '@/app/controller/blockbook/block'
 import { IBlockbookInfoController } from '@/app/controller/blockbook/info'
+import { IBlockbookTransactionController } from '@/app/controller/blockbook/transaction'
 import { IInsightAddressController } from '@/app/controller/insight/address'
 import { IInsightBlockController } from '@/app/controller/insight/block'
 import { IInsightInfoController } from '@/app/controller/insight/info'
@@ -32,8 +34,6 @@ import { IQRC20Service } from '@/app/service/qrc20'
 import { IQRC721Service } from '@/app/service/qrc721'
 import { IStatisticsService } from '@/app/service/statistics'
 import { ITransactionService } from '@/app/service/transaction'
-import { IBlockbookBlockController } from '@/app/controller/blockbook/block'
-import { IBlockbookTransactionController } from '@/app/controller/blockbook/transaction'
 
 declare module 'egg' {
   export const CHAIN = Symbol('vips.chain')
@@ -83,7 +83,10 @@ declare module 'egg' {
       ) => Promise<void>
       contract(
         paramName?: string
-      ): (ctx: CustomContextForContract, next: CallableFunction) => Promise<void>
+      ): (
+        ctx: CustomContextForContract,
+        next: CallableFunction
+      ) => Promise<void>
       pagination(
         object?: PaginationConstructor
       ): (
